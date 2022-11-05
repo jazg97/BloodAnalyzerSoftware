@@ -1,10 +1,13 @@
 import xml.etree.ElementTree as et
 import pandas as pd
 from IPython.display import display
+import os
+
+root_dir = os.path.dirname(os.path.realpath(__file__))
 
 #1) Parsing the xml file through the ElementTree parse function
-path = 'C:\\Users\\jazg2\\Downloads\\20211027165438.xml'
-tree = et.parse(path)
+filename = '20211027165438.xml'
+tree = et.parse(os.path.join(root_dir,filename))
 
 #2) Getting parent tag of xml file
 root = tree.getroot()
@@ -78,5 +81,5 @@ for idx, val in enumerate(attrib_list):
         pass
     print(string)
 
-path = 'C:\\Users\\jazg2\\Downloads\\test.csv'
-df.to_csv(path)
+out_file = os.path.join(root_dir, 'test.csv')
+df.to_csv(out_file)
