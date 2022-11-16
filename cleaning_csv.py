@@ -7,6 +7,8 @@ file = os.path.join(root_dir, 'tests', 'test4.csv')
 
 dataframe = pd.read_csv(file)
 
+og = dataframe.copy()
+
 columns = dataframe.columns
 
 selected = [column for column in columns if ('raw' in column.lower() or 'valid' in column.lower())]
@@ -48,10 +50,18 @@ df = dataframe.copy()
 
 for col in df:
     unique = df[col].unique()
-    if df[col].isnull().all() or df[col].isna().all() or (len(unique) == 1 and unique[0] == '\n'):
+    if df[col].isnull().all() or df[col].isna().all() or (len(unique) == 1 and unique[0] == '\n') or ('flag' in col.lower() and 'histogram' not in col.lower()) or '_Id' in col or 'Valid' in col:
         df = df.drop(col, axis=1)
-
-print('Number of removed columns:', len(set(list(dataframe)) - set(list(df))))
+df = df.drop('ExpiredReagent', axis=1)
+df = df.drop('OPERATOR', axis=1)
+df = df.drop('PACKET_TYPE', axis = 1)
+df = df.drop('Unnamed: 0', axis = 1)
+df = df.drop('InvalidAlarmStartup',axis=1)
+df = df.drop('QCFailed', axis=1)
+df = df.drop('InvalidQC', axis = 1)
+df = df.drop('SAMPLING_MODE', axis = 1)
+#df = df.drop('Unnamed: 29')
+print('Number of removed columns:', len(set(list(og)) - set(list(df))))
 
 
 out_file = os.path.join(root_dir, 'tests', 'cleaned_data.csv')
