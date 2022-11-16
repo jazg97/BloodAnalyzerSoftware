@@ -41,7 +41,7 @@ for loc, file in enumerate(filenames):
                 if val[key] == 'THRESHOLDS':
                     thresh = True
                 #data = pd.DataFrame({string: val_list[idx]}, index = [0])
-            if hist:
+            if hist and 'Flags':
                 #We add an identifier to each histogram, to avoid rewriting on the same column
                 string = previous_string.split('_')[0]+'_'+string
                 df[string] = [val_list[idx+1]]
@@ -61,8 +61,9 @@ for loc, file in enumerate(filenames):
                 df[string] = [(';').join(out)]
             elif 'Flags' in string and attrib_list[idx]['n'].lower() != 'flags':
                 #A no so elegant way to solve the issue (temporary)
-                string = attrib_list[idx-2]['n'].split('_')[0]+'_'+string
-                df[string] = [val_list[idx]]
+                #string = attrib_list[idx-2]['n'].split('_')[0]+'_'+string
+                #df[string] = [val_list[idx]]
+                pass
             else:
                 df[string] = [val_list[idx]]
                 #df[string] = val_list[idx]
@@ -73,12 +74,10 @@ for loc, file in enumerate(filenames):
         if np.in1d(loc, test_files)[0]:
             print(string)
     export_df = export_df.append(df)
-    try:
-        index.append(df['FIELD_SID_PATIENT_ID'].values[0].split(' ')[0]+'_'+df['ANALYSIS_DATE'].values[0].split(' ')[0].replace('/',''))
-    except:
-        index.append(df['FIELD_SID_SPECIES_ID'].values[0].split(' ')[0]+'_'+df['ANALYSIS_DATE'].values[0].split(' ')[0].replace('/',''))
-        n+=1
+    
+        #n+=1
 
-export_df.index = index
-out_file = os.path.join(root_dir, 'test3.csv')
+#export_df.index = index
+export_df.dropna(how='all', axis=1)
+out_file = os.path.join(root_dir, 'tests', 'test4.csv')
 export_df.to_csv(out_file)
