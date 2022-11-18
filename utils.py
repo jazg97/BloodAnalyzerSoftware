@@ -1,7 +1,8 @@
 import xml.etree.ElementTree as et
 import pandas as pd
 import os
-
+import matplotlib.pyplot as plt
+root_dir = os.path.dirname(os.path.realpath(__file__))
 #Recursive solution ---> automatic subnode detection and formatting
 def recursive_parsing(node, identifier='o', attrib_list=[], val_list=[], idef=''):
     for child in node:
@@ -22,3 +23,20 @@ def recursive_parsing(node, identifier='o', attrib_list=[], val_list=[], idef=''
 
     return attrib_list, val_list
 
+def plot_rawdata(patient_id, feature, dataframe):
+    patient_df = dataframe[dataframe['FIELD_SID_PATIENT_ID']==patient_id]
+    data_points = patient_df[feature]
+    dates = dataframe['ANALYSIS_DATE'][data_points.index]
+    dates = [date.split(' ')[0] for date in dates.values]
+    limits = [dataframe[feature.split('_')[0]+'_'+limit][data_points.index].values[0] for limit in ['LowLimit', 'HighLimit']]
+    plt.figure()
+    plt.plot(dates, data_points, label=feature, ls=':')
+    plt.xlabel('Date')
+    plt.ylabel(feature)
+    plt.title('Patient '+patient_id)
+    plt.axhline(y = limits[0], label='LowLimit', ls='-.', c='r')
+    plt.axhline(y = limits[1], label='HighLimit', ls='-.', c='r')
+    plt.legend()
+    plt.savefig(os.path.join(root_dir,'figures',patient_id+'_'+feature+'.png'), dpi=300)
+    plt.show()
+    
