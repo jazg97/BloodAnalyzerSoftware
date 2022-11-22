@@ -44,7 +44,21 @@ print(unique_id[0])
 print(dataframe[dataframe['FIELD_SID_PATIENT_ID'] == ''].index)
 #There is no longer any row without a patient id
 
+#invalid_ids = dataframe[dataframe['FIELD_SID_OWNER_LASTNAME'].str.isnumeric() == True].index
+#dataframe.drop(invalid_ids, inplace=True)
 #Removing columns with just NaN, None or '\n' values
+
+dataframe.loc[dataframe['FIELD_SID_OWNER_LASTNAME'].isnull(), 'FIELD_SID_OWNER_LASTNAME'] = 'GUEZGUEZ'
+
+dataframe.loc[dataframe['FIELD_SID_OWNER_LASTNAME'].str.isnumeric(), 'FIELD_SID_OWNER_LASTNAME'] = 'GUEZGUEZ'
+
+dataframe.loc[(dataframe['FIELD_SID_OWNER_LASTNAME'] !='SCHUPPAN') & (dataframe['FIELD_SID_OWNER_LASTNAME'] !='GUEZGUEZ'), 'FIELD_SID_ANIMAL_NAME'] =  dataframe.loc[(dataframe['FIELD_SID_OWNER_LASTNAME'] !='SCHUPPAN') & (dataframe['FIELD_SID_OWNER_LASTNAME'] !='GUEZGUEZ'), 'FIELD_SID_OWNER_LASTNAME']
+
+dataframe.loc[(dataframe['FIELD_SID_OWNER_LASTNAME'] !='SCHUPPAN') & (dataframe['FIELD_SID_OWNER_LASTNAME'] !='GUEZGUEZ'), 'FIELD_SID_OWNER_LASTNAME'] = 'GUEZGUEZ'
+
+dataframe.loc[dataframe['FIELD_SID_ANIMAL_NAME'].isnull(), 'FIELD_SID_ANIMAL_NAME'] = 'BLOOD'
+
+dataframe.loc[(dataframe['FIELD_SID_ANIMAL_NAME'] == 'SPL') | (dataframe['FIELD_SID_ANIMAL_NAME'] == 'SP') , 'FIELD_SID_ANIMAL_NAME'] = 'SPLEEN'
 
 df = dataframe.copy()
 
@@ -52,6 +66,10 @@ for col in df:
     unique = df[col].unique()
     if df[col].isnull().all() or df[col].isna().all() or (len(unique) == 1 and unique[0] == '\n') or ('flag' in col.lower() and 'histogram' not in col.lower()) or '_Id' in col or 'Valid' in col or 'Unit' in col:
         df = df.drop(col, axis=1)
+
+dr_columns = pd.read_csv(os.path.join(root_dir, 'tests', 'columns_to_drop.csv'))
+
+#Deleting specific columns
 df = df.drop('ExpiredReagent', axis=1)
 df = df.drop('OPERATOR', axis=1)
 df = df.drop('PACKET_TYPE', axis = 1)
@@ -62,10 +80,12 @@ df = df.drop('InvalidQC', axis = 1)
 df = df.drop('SAMPLING_MODE', axis = 1)
 df = df.drop('Archived', axis = 1)
 df = df.drop('EOS#_EOS', axis = 1)
-#df = df.drop('Unnamed: 29')
+df = df.drop(dr_columns.columns, axis=1)
+df = df.drop('Unnamed: 29', axis = 1)
+
+df['FIELD_SID_PATIENT_LAST_NAME'] = ''
 
 print('Number of removed columns:', len(set(list(og)) - set(list(df))))
-
 
 out_file = os.path.join(root_dir, 'tests', 'cleaned_data.csv')
 df.to_csv(out_file)
