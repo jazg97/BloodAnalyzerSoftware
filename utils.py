@@ -39,4 +39,20 @@ def plot_rawdata(patient_id, feature, dataframe):
     plt.legend()
     plt.savefig(os.path.join(root_dir,'figures',patient_id+'_'+feature+'.png'), dpi=300)
     plt.show()
+
+def subplot_feature(patient_ids, feature, canvas, axis, dataframe):
+    for patient in patients_ids:
+        print(patient)
+        patient_df = dataframe[dataframe['FIELD_SID_PATIENT_ID']==patient]
+        datapoints = patient_df[feature]
+        print(datapoints)
+        dates = dataframe['ANALYSIS_DATE'][datapoints.index]
+        dates = [date.split(' ')[0] for date in dates.values]
+        limits = [dataframe[feature.split('_')[0]+'_'+limit][datapoints.index].values[0] for limit in ['LowLimit', 'HighLimit']]
+        axis.plot(dates, datapoints, label=patient, ls=':')
+        axis.axhline(y = limits[0], label='LowLimit', ls='-.', c='r')
+        axis.axhline(y = limits[1], label='HighLimit', ls='-.', c='r')
+    axis.legend()
+    canvas.draw()
     
+
