@@ -2,13 +2,19 @@ import xml.etree.ElementTree as et
 import pandas as pd
 import os
 import matplotlib.pyplot as plt
+
 root_dir = os.path.dirname(os.path.realpath(__file__))
+
 #Recursive solution ---> automatic subnode detection and formatting
 def recursive_parsing(node, identifier='o', attrib_list=[], val_list=[], idef=''):
     for child in node:
         #This conditional adds the identifier of the parent node, to easily differentiate
         #between equally named parameters, such as HighLimit, LowLimit, etc.
         if child.tag != identifier:
+
+            if child.attrib['n'] == 'FIELD_SID_ANIMAL_NAME' and child.test == '':
+                child.text = 'BLOOD'
+
             if idef!='':
                 try:
                     child.attrib['n'] = idef['n']+'_'+child.attrib['n'] 
@@ -39,4 +45,20 @@ def plot_rawdata(patient_id, feature, dataframe):
     plt.legend()
     plt.savefig(os.path.join(root_dir,'figures',patient_id+'_'+feature+'.png'), dpi=300)
     plt.show()
+
+def subplot_feature(patient_ids, feature, canvas, axis, dataframe):
+    for patient in patients_ids:
+        print(patient)
+        patient_df = dataframe[dataframe['FIELD_SID_PATIENT_ID']==patient]
+        datapoints = patient_df[feature]
+        print(datapoints)
+        dates = dataframe['ANALYSIS_DATE'][datapoints.index]
+        dates = [date.split(' ')[0] for date in dates.values]
+        limits = [dataframe[feature.split('_')[0]+'_'+limit][datapoints.index].values[0] for limit in ['LowLimit', 'HighLimit']]
+        axis.plot(dates, datapoints, label=patient, ls=':')
+        axis.axhline(y = limits[0], label='LowLimit', ls='-.', c='r')
+        axis.axhline(y = limits[1], label='HighLimit', ls='-.', c='r')
+    axis.legend()
+    canvas.draw()
     
+
