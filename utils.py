@@ -2,13 +2,19 @@ import xml.etree.ElementTree as et
 import pandas as pd
 import os
 import matplotlib.pyplot as plt
+
 root_dir = os.path.dirname(os.path.realpath(__file__))
+
 #Recursive solution ---> automatic subnode detection and formatting
 def recursive_parsing(node, identifier='o', attrib_list=[], val_list=[], idef=''):
     for child in node:
         #This conditional adds the identifier of the parent node, to easily differentiate
         #between equally named parameters, such as HighLimit, LowLimit, etc.
         if child.tag != identifier:
+
+            if child.attrib['n'] == 'FIELD_SID_ANIMAL_NAME' and child.test == '':
+                child.text = 'BLOOD'
+
             if idef!='':
                 try:
                     child.attrib['n'] = idef['n']+'_'+child.attrib['n'] 

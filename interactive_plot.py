@@ -142,7 +142,7 @@ class Dialog(QtWidgets.QMainWindow):
             axis.set_xlabel('Date')
             axis.set_ylabel(feature)
             axis.title.set_text(raw_feature +' Timeseries')
-            axis.set_ylim(min_value, max_value+2)
+            axis.set_ylim(min_value-1, max_value+2)
             axis.margins(0)
             axis.legend()
         self.canvas.draw()
