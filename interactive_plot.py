@@ -56,6 +56,7 @@ class Dialog(QtWidgets.QMainWindow):
         myQWidget = QtWidgets.QWidget()
         
         first_row = QtWidgets.QHBoxLayout()
+        second_row = QtWidgets.QHBoxLayout()
         myQWidget.setLayout(root_layout)
         self.setCentralWidget(myQWidget)
         self.id_box = CheckableComboBox()
@@ -68,7 +69,7 @@ class Dialog(QtWidgets.QMainWindow):
         self.selected_label.setSelectable(False)
             
         self.feature_label = QtGui.QStandardItem("----- Select Feature(s) -----")
-        self.feature_label.setBackground(QtGui.QBrush(QtGui.QColor(80,120,150)))
+        self.feature_label.setBackground(QtGui.QBrush(QtGui.QColor(140,120,150)))
         self.feature_label.setSelectable(False)
         
         self.id_box.model().setItem(0,0,self.selected_label)
@@ -86,11 +87,23 @@ class Dialog(QtWidgets.QMainWindow):
             self.feature_box.addItem('%s'% self.features[i])
             item = self.feature_box.model().item(i+1,0)
             item.setCheckState(QtCore.Qt.Unchecked)
+
+        self.date_label = QtGui.QStandardItem("----- Select/Deselect Dates -----")
+        self.date_label.setBackground(QtGui.QBrush(QtGui.QColor(120,180,130)))
+        self.date_label.setSelectable(False)
+        self.date_box = CheckableComboBox()
+        self.date_box.model().setItem(0,0,self.date_label)
+        self.date_box.lineEdit().setText("----- Select/Deselect Dates ------")
+        
         first_row.addWidget(self.id_box)
         first_row.addWidget(self.feature_box)
         first_row.addWidget(self.plot_button)
+        second_row.addWidget(self.toolbar)
+        second_row.addWidget(self.date_box)
+        second_row.addStretch()
+        self.date_box.setVisible(False)
         root_layout.addLayout(first_row)
-        root_layout.addWidget(self.toolbar)
+        root_layout.addLayout(second_row)
         root_layout.addWidget(self.canvas)
         self.toolbar.setVisible(False)
         self.canvas.setVisible(False)
@@ -104,6 +117,7 @@ class Dialog(QtWidgets.QMainWindow):
         features = self.feature_box.selected_items
         self.toolbar.setVisible(True)
         self.canvas.setVisible(True)
+        self.date_box.setVisible(True)
         self.canvas.fig.clf()
         self.canvas.axs = []
         axis = None
