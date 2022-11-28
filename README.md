@@ -4,8 +4,6 @@
 
 	* [Overview](#overview)
 	* [Dependencies](#dependencies)
-		* [Check with pip](#check-with-pip)
-		* [Check with conda](#check-with-conda)
 	* [Usage](#usage)
 	* [Examples](#examples)
 	* [License] (#license)
@@ -24,7 +22,7 @@ Make sure you have the following libraries installed in your Python environment:
 - numpy 
 - xml 
 
-###Check with pip
+### Check with pip
 
 ```bash
 pip list
@@ -32,7 +30,7 @@ pip install uninstalled_package
 
 ```
 
-###Check with conda
+### Check with conda
 
 ```bash
 conda list
