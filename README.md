@@ -1,10 +1,10 @@
 # blood-analyzer-software
 
-## Table of contents (#table-of-contents)
+## Table of contents
 
 1. [Overview](#overview)
 2. [Dependencies](#dependencies)
-	- [Get reposity](#get-repository)
+	- [Clone repository](#get-repository)
 3. [Usage](#usage)
 4. [Examples](#examples)
 5. [License] (#license)
@@ -61,5 +61,5 @@ These are some common usage examples.
 
 ## License
 
-[MIT](LICENSE) - Jose Zapana & Eric Schmitt - 2022
+Blood Analyzer Software is released under the [MIT License](http://www.opensource.org/licenses/MIT) - Jose Zapana & Eric Schmitt - 2022
 
