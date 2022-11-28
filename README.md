@@ -1,6 +1,6 @@
 # blood-analyzer-software
 
-## Table of contents ((#table-of-contents)
+## Table of contents (#table-of-contents)
 
 1. [Overview](#overview)
 2. [Dependencies](#dependencies)
@@ -56,6 +56,8 @@ $ python3 feature_code.py
 ```
 
 ## Examples
+
+These are some common usage examples.
 
 ## License
 
