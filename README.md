@@ -4,6 +4,8 @@
 
 	* [Overview](#overview)
 	* [Dependencies](#dependencies)
+		* [Check with pip](#check-with-pip)
+		* [Check with conda](#check-with-conda)
 	* [Usage](#usage)
 	* [Examples](#examples)
 	* [License] (#license)
