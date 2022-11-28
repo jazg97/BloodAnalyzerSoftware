@@ -1,12 +1,13 @@
 # blood-analyzer-software
 
-## Table of contents
+## Table of contents ((#table-of-contents)
 
-	* [Overview](#overview)
-	* [Dependencies](#dependencies)
-	* [Usage](#usage)
-	* [Examples](#examples)
-	* [License] (#license)
+1. [Overview](#overview)
+2. [Dependencies](#dependencies)
+	- [Get reposity](#get-repository)
+3. [Usage](#usage)
+4. [Examples](#examples)
+5. [License] (#license)
 
 ## Overview
 
@@ -35,6 +36,17 @@ pip install uninstalled_package
 ```bash
 conda list
 conda install uninstalled_package
+```
+
+### Get repository
+
+Open _Terminal_ or _IDE_ of preference in your 'projects' folder and take the following steps:
+
+```bash
+#Step 1: Get sources from GitHub
+$ git clone https://github.com/jazg97/Leukaemia_BloodAnalyzer.git
+$ cd Leukaemia_BloodAnalyzer
+$ python3 feature_code.py
 ```
 
 ## Usage
