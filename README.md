@@ -13,7 +13,7 @@
 
 ## Overview
 
-<img alt="Overview of blood analyzer system" src="docs/uver_overview.svg" width="75%">
+<img alt="Overview of blood analyzer system" src="docs/user_overview.svg" width="75%">
 
 ## Setup
 
