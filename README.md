@@ -5,9 +5,10 @@
 1. [Overview](#overview)
 2. [Dependencies](#dependencies)
 	- [Clone repository](#get-repository)
-3. [Usage](#usage)
-4. [Examples](#examples)
-5. [License] (#license)
+3. [Folder structure](#folder-structure)
+4. [Features](#features)
+5. [Examples](#examples)
+6. [License](#license)
 
 ## Overview
 
@@ -38,7 +39,7 @@ conda list
 conda install uninstalled_package
 ```
 
-### Get repository
+### Clone repository
 
 Open _Terminal_ or _IDE_ of preference in your 'projects' folder and take the following steps:
 
@@ -49,7 +50,39 @@ $ cd Leukaemia_BloodAnalyzer
 $ python3 feature_code.py
 ```
 
-## Usage
+## Folder structure
+
+.
+│   LICENSE.md
+│   README.md
+│   tree.txt
+│   
+├───data
+│       20211027165438.xml
+│       20221031134832.xml
+│       
+├───docs
+├───features
+│       cleaning_csv.py
+│       generating_plots.py
+│       GUI.py
+│       parsing_multiple_files.py
+│       parsing_xml.py
+│       utils.py
+│       
+├───figures
+│       
+└───tests
+        cleaned_data.csv
+        columns_to_drop.csv
+        test.csv
+        test2.csv
+        test3.csv
+        test4.csv
+        
+## Features
+
+
 
 ```py
 
