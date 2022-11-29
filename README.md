@@ -8,7 +8,8 @@
 3. [Folder structure](#folder-structure)
 4. [Features](#features)
 5. [Examples](#examples)
-6. [License](#license)
+6. [Contact us](#contact-us)
+7. [License](#license)
 
 ## Overview
 
@@ -64,34 +65,31 @@ $ python3 feature_code.py
 
 The project has the following structure:
       
-.
-|   LICENSE.md
-|   README.md
-|   
-+---data
-|       20211027165438.xml
-|       20221031134832.xml
-|       
-+---docs
-+---features
-|       cleaning_csv.py
-|       generating_plots.py
-|       GUI.py
-|       parsing_multiple_files.py
-|       parsing_xml.py
-|       utils.py
-|       
-+---figures
-|       multiple_ids_feature_ex1.png
-|       multiple_ids_feature_ex2.png
-|       
-+---tests
-        cleaned_data.csv
-        columns_to_drop.csv
-        test.csv
-        test2.csv
-        test3.csv
-        test4.csv
+    .
+    │
+    ├── data
+    │   ├── 20211027165438.xml
+    │   ├── 20221031134832.xml
+    │   │
+    ├── docs
+    ├── features
+    │   ├── cleaning_csv.py
+    │   ├── generating_plots.py
+    │   ├── GUI.py
+    │   ├── parsing_multiple_files.py
+    │   ├── parsing_xml.py
+    │   ├── utils.py
+    │   │
+    ├── figures
+    │   ├── multiple_ids_feature_ex1.png
+    │   ├── multiple_ids_feature_ex2.png
+    ├── features
+    │   ├── cleaned_data.csv
+    │   ├── columns_to_drop.csv
+    │   ├── test.csv
+    │   ├── test2.csv
+    │   ├── test3.csv
+    │   ├── test4.csv
                 
 ## Features
 
@@ -105,10 +103,6 @@ The project has the following structure:
 
 These are some common usage examples.
 
-## License
-
-Blood Analyzer Software is released under the [MIT License](http://www.opensource.org/licenses/MIT) - Jose Zapana & Eric Schmitt - 2022.
-
 ## Contact Us
 
 - Jose Zapana
@@ -118,4 +112,8 @@ Blood Analyzer Software is released under the [MIT License](http://www.opensourc
 - Eric Schmitt
 [![Gmail Badge 2](https://img.shields.io/badge/Gmail-100000?style=for-the-badge&logo=gmail&logoColor=white)](mailto:e.schmitt@dkfz-heidelberg.de)
 [![GitHub Badge 2](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/ECSchmitt)
+
+## License
+
+Blood Analyzer Software is released under the [MIT License](http://www.opensource.org/licenses/MIT) - Jose Zapana & Eric Schmitt - 2022.
 
