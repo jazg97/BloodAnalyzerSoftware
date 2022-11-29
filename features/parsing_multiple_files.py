@@ -1,13 +1,13 @@
 from utils import *
-import numpy as np
-
-
-root_dir = os.path.dirname(os.path.realpath(__file__))
 
 #1) Parsing the xml file through the ElementTree parse function
 #filename = '20211027165438.xml'
 
-directory = 'C:\\Users\\jazg2\\Downloads\\ar-105EVOH17880-results-20221031135054'
+directory = sys.argv[-2]
+
+output_name = sys.argv[-1]
+
+#Example directory 'C:\\Users\\jazg2\\Downloads\\ar-105EVOH17880-results-20221031135054'
 
 filenames = os.listdir(directory)
 
@@ -79,5 +79,5 @@ for loc, file in enumerate(filenames):
 
 #export_df.index = index
 export_df.dropna(how='all', axis=1)
-out_file = os.path.join(root_dir, 'tests', 'test4.csv')
+out_file = os.path.join('\\'.join(root_dir.split('\\')[:-1]), 'tests', output_name)
 export_df.to_csv(out_file)
