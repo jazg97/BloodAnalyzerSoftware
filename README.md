@@ -13,6 +13,8 @@
 
 ## Overview
 
+<img alt="Overview of blood analyzer system" src="docs/uver_overview.svg" width="75%">
+
 ## Setup
 
 Blood Analyzer Software is a [Python](https:///www.python.org)-based program. The Python language has an [Installation page](https://www.python.org/downloads/) for Windows & Mac users.
