@@ -52,33 +52,36 @@ $ python3 feature_code.py
 
 ## Folder structure
 
+      
 .
-│   LICENSE.md
-│   README.md
-│   tree.txt
-│   
-├───data
-│       20211027165438.xml
-│       20221031134832.xml
-│       
-├───docs
-├───features
-│       cleaning_csv.py
-│       generating_plots.py
-│       GUI.py
-│       parsing_multiple_files.py
-│       parsing_xml.py
-│       utils.py
-│       
-├───figures
-│       
-└───tests
+|   LICENSE.md
+|   README.md
+|   
++---data
+|       20211027165438.xml
+|       20221031134832.xml
+|       
++---docs
++---features
+|       cleaning_csv.py
+|       generating_plots.py
+|       GUI.py
+|       parsing_multiple_files.py
+|       parsing_xml.py
+|       utils.py
+|       
++---figures
+|       multiple_ids_feature_ex1.png
+|       multiple_ids_feature_ex2.png
+|       
++---tests
         cleaned_data.csv
         columns_to_drop.csv
         test.csv
         test2.csv
         test3.csv
         test4.csv
+        
         
 ## Features
 
