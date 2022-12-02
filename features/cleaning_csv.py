@@ -1,7 +1,7 @@
 from utils import *
 import numpy as np
 
-root_dir = os.path.dirname(os.path.realpath(__file__))
+root_dir = '\\'.join(os.path.dirname(os.path.realpath(__file__)).split('\\')[:-1])
 
 file = os.path.join(root_dir, 'tests', 'test4.csv')
 

@@ -9,6 +9,10 @@ plt.style.use('ggplot')
 import numpy as np
 from utils import *
 
+PLT = ['MPV','PLT']
+RBC = ['HCT', 'HBG', 'MCH', 'MCHC', 'MCV', 'RBC', 'RDW']
+WBC = ['EOS%', 'EOS#', 'GRA%', 'GRA#', 'LYM%', 'LYM#', 'MON%', 'MON#', 'WBC']
+
 #Class wrapper for Canvas and Plotting Capabilities
 class MplCanvas(FigureCanvasQTAgg):
     def __init__(self, parent=None, width=12, height=9, dpi=100, axes=1):
@@ -38,14 +42,14 @@ class CheckableComboBox(QtWidgets.QComboBox):
             item.setCheckState(QtCore.Qt.Checked)
             self.selected_items.append(item.text())
 
-       #print(self.selected_items)
+        #print(self.selected_items)
 
 #Class wrapper for Dialog test window
 class Dialog(QtWidgets.QMainWindow):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        location = os.path.dirname(os.path.realpath(__file__))
+        location = '\\'.join(os.path.dirname(os.path.realpath(__file__)).split('\\')[:-1])
 
         self.dataframe = pd.read_csv(os.path.join(location,'tests','cleaned_data.csv'))
         self.unique_ids = np.unique(self.dataframe['FIELD_SID_PATIENT_ID'].values)
@@ -71,6 +75,10 @@ class Dialog(QtWidgets.QMainWindow):
         self.feature_label = QtGui.QStandardItem("----- Select Feature(s) -----")
         self.feature_label.setBackground(QtGui.QBrush(QtGui.QColor(140,120,150)))
         self.feature_label.setSelectable(False)
+
+        self.family_label = QtGui.QStandardItem("----- Select Blood Test(s) -----")
+        self.family_label.setBackground(QtGui.QBrush(QtGui.QColor(140,120,150)))
+        self.family_label.setSelectable(False)
         
         self.id_box.model().setItem(0,0,self.selected_label)
         self.id_box.lineEdit().setText("----- Select Patient(s) -----")
@@ -79,6 +87,15 @@ class Dialog(QtWidgets.QMainWindow):
             self.id_box.addItem('Patient ID %s' % self.unique_ids[i])
             item = self.id_box.model().item(i+1, 0)
             item.setCheckState(QtCore.Qt.Unchecked)
+
+        self.test_box = CheckableComboBox()
+        self.test_box.model().setItem(0,0,self.family_label)
+        self.test_box.lineEdit().setText("----- Select Blood Test(s) -----")
+        for i, value in enumerate(['BLOOD', 'SPLEEN', 'BM']):
+            self.test_box.addItem('%s' % value)
+            item = self.test_box.model().item(i+1,0)
+            item.setCheckState(QtCore.Qt.Unchecked)
+            
 
         self.feature_box = CheckableComboBox()
         self.feature_box.model().setItem(0,0,self.feature_label)
@@ -96,6 +113,7 @@ class Dialog(QtWidgets.QMainWindow):
         self.date_box.lineEdit().setText("----- Select/Deselect Dates ------")
         
         first_row.addWidget(self.id_box)
+        first_row.addWidget(self.test_box)
         first_row.addWidget(self.feature_box)
         first_row.addWidget(self.plot_button)
         second_row.addWidget(self.toolbar)
@@ -112,9 +130,14 @@ class Dialog(QtWidgets.QMainWindow):
     def gen_plot(self):
         print("Selected Patients:", self.id_box.selected_items)
         print("Selected Features:", self.feature_box.selected_items)
-
+        print("Selected Tests:", self.test_box.selected_items)
+        
         patient_ids = self.id_box.selected_items
         features = self.feature_box.selected_items
+        tests = self.test_box.selected_items
+        selected_dates = self.date_box.selected_items
+        if selected_dates:
+            print("Selected Dates:", selected_dates)
         self.toolbar.setVisible(True)
         self.canvas.setVisible(True)
         self.date_box.setVisible(True)
@@ -129,26 +152,31 @@ class Dialog(QtWidgets.QMainWindow):
             else:
                 axis = self.canvas.fig.add_subplot(2,int(np.ceil(len(features)/2)),idx+1)
             raw_feature = feature + '_Raw'
-            print(raw_feature)
-            flag = False
+            #print(raw_feature)
             data = []
+            datepoints = []
             for patient in patient_ids:
                 patient = patient.split(' ')[-1]
-                patient_df = self.dataframe[self.dataframe['FIELD_SID_PATIENT_ID']==patient]
+                if selected_dates:
+                    patient_df = self.dataframe[(self.dataframe['FIELD_SID_PATIENT_ID']==patient) & (self.dataframe['FIELD_SID_ANIMAL_NAME'].isin(tests)) & (self.dataframe['ANALYSIS_DATE'].str.contains('|'.join(selected_dates), case=True))]
+                    #self.dataframe['ANALYSIS_DATE'].isin(selected_dates)
+                    #print(patient_df)
+                else:
+                    patient_df = self.dataframe[(self.dataframe['FIELD_SID_PATIENT_ID']==patient) & (self.dataframe['FIELD_SID_ANIMAL_NAME'].isin(tests))]
                 datapoints = patient_df[raw_feature]
-                print(datapoints.values)
+                #print(datapoints.values)
                 dates = self.dataframe['ANALYSIS_DATE'][datapoints.index]
                 dates = [date.split(' ')[0] for date in dates.values]
-                print(dates)
+                #print(dates)
                 axis.plot(dates, datapoints, label=patient, ls=':', linewidth=2.5)
                 limits = [self.dataframe[feature+'_'+limit][datapoints.index].values[0] for limit in ['LowLimit', 'HighLimit']]
                 data.append(datapoints)
+                datepoints.append(dates)
 
             min_value = np.min(np.hstack(data).flatten())
             max_value = np.max(np.hstack(data).flatten())
 
-            print(min_value)
-            print(max_value)
+            unique_dates = np.unique(np.hstack(datepoints).flatten())
 
             axis.axhline(y = limits[0], label='LowLimit', ls='-.', c='r')
             axis.axhline(y = limits[1], label='HighLimit', ls='-.', c='y')       
@@ -160,6 +188,12 @@ class Dialog(QtWidgets.QMainWindow):
             axis.margins(0)
             axis.legend()
         self.canvas.draw()
+
+        for i in range(len(unique_dates)):
+            self.date_box.addItem('%s'% unique_dates[i])
+            item = self.date_box.model().item(i+1,0)
+            item.setCheckState(QtCore.Qt.Unchecked)
+            #item.setCheckState(QtCore.Qt.Checked)
 
         #self.setFixedWidth(1500)
         #self.setFixedHeight(1200)

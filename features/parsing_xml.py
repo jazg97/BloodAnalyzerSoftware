@@ -8,7 +8,7 @@ root_dir = os.path.dirname(os.path.realpath(__file__))
 #1) Parsing the xml file through the ElementTree parse function
 #filename = '20211027165438.xml'
 filenames = ['20211027165438.xml', '20221031134832.xml']
-tree = et.parse(os.path.join(root_dir,filename))
+tree = et.parse(os.path.join(('\\').join(root_dir.split('\\')[:-1]),'data',filenames[0]))
 
 #2) Getting parent tag of xml file
 root = tree.getroot()
@@ -108,5 +108,5 @@ for file in filename:
             pass
         print(string)
 
-out_file = os.path.join(root_dir, 'test2.csv')
-df.to_csv(out_file)
+#out_file = os.path.join(root_dir, 'test2.csv')
+#df.to_csv(out_file)
