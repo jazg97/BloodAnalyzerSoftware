@@ -20,6 +20,35 @@ class MplCanvas(FigureCanvasQTAgg):
         self.axs = []
         super().__init__(self.fig)
 
+class TableWindow(QtWidgets.QMainWindow):
+    def __init__(self, dataframe, *args, **kwargs):
+        
+        super().__init__(*args, **kwargs)
+        self.widget = QtWidgets.QWidget()
+        self.scroll = QtWidgets.QScrollArea()
+        self.layout = QtWidgets.QVBoxLayout()
+        self.datatable = QtWidgets.QTableWidget()
+
+        self.df = dataframe
+        self.datatable.setColumnCount(self.df.shape[1])
+        self.datatable.setRowCount(self.df.shape[0])
+
+        self.datatable.setHorizontalHeaderLabels(self.df.columns)
+        #self.datatable.horizontalHeaderItem().setTextAlignment(Qt.AlignHCenter)
+
+        for i in range(self.df.shape[0]):
+            for j in range(self.df.shape[1]):
+                self.datatable.setItem(i,j,QtWidgets.QTableWidgetItem(str(self.df.iloc[i, j])))
+        self.scroll.setWidget(self.datatable)
+        self.layout.addWidget(self.datatable)
+        
+        self.widget.setLayout(self.layout)
+        self.setCentralWidget(self.widget)
+
+        self.setWindowTitle("Dataframe")
+        self.show()
+
+
 #Class wrapper for multi-item combo box
 class CheckableComboBox(QtWidgets.QComboBox):
     def __init__(self):
@@ -111,6 +140,10 @@ class Dialog(QtWidgets.QMainWindow):
         self.date_box = CheckableComboBox()
         self.date_box.model().setItem(0,0,self.date_label)
         self.date_box.lineEdit().setText("----- Select/Deselect Dates ------")
+
+        self.df_button = QtWidgets.QPushButton('Show Dataframe')
+        self.table_window= None
+        #self.df_button.setFont(font)
         
         first_row.addWidget(self.id_box)
         first_row.addWidget(self.test_box)
@@ -118,14 +151,17 @@ class Dialog(QtWidgets.QMainWindow):
         first_row.addWidget(self.plot_button)
         second_row.addWidget(self.toolbar)
         second_row.addWidget(self.date_box)
+        second_row.addWidget(self.df_button)
         second_row.addStretch()
         self.date_box.setVisible(False)
         root_layout.addLayout(first_row)
         root_layout.addLayout(second_row)
         root_layout.addWidget(self.canvas)
         self.toolbar.setVisible(False)
+        self.df_button.setVisible(False)
         self.canvas.setVisible(False)
         self.plot_button.clicked.connect(self.gen_plot)
+        self.df_button.clicked.connect(self.show_dataframe)
 
     def gen_plot(self):
         print("Selected Patients:", self.id_box.selected_items)
@@ -141,6 +177,7 @@ class Dialog(QtWidgets.QMainWindow):
         self.toolbar.setVisible(True)
         self.canvas.setVisible(True)
         self.date_box.setVisible(True)
+        self.df_button.setVisible(True)
         self.canvas.fig.clf()
         self.canvas.axs = []
         axis = None
@@ -197,6 +234,24 @@ class Dialog(QtWidgets.QMainWindow):
 
         #self.setFixedWidth(1500)
         #self.setFixedHeight(1200)
+
+    def show_dataframe(self):
+        patient_ids = [patient.split(' ')[-1] for patient in self.id_box.selected_items]
+        features = self.feature_box.selected_items
+        tests = self.test_box.selected_items
+        selected_dates = self.date_box.selected_items
+        if selected_dates:
+            patient_df = self.dataframe[(self.dataframe['FIELD_SID_PATIENT_ID'].str.contains('|'.join(patient_ids), case=True)) & (self.dataframe['FIELD_SID_ANIMAL_NAME'].isin(tests)) & (self.dataframe['ANALYSIS_DATE'].str.contains('|'.join(selected_dates), case=True))]
+            #self.dataframe['ANALYSIS_DATE'].isin(selected_dates)
+            #print(patient_df)
+        else:
+            patient_df = self.dataframe[(self.dataframe['FIELD_SID_PATIENT_ID'].str.contains('|'.join(patient_ids), case=True)) & (self.dataframe['FIELD_SID_ANIMAL_NAME'].isin(tests))]
+        cols = [col for col in patient_df.columns if col in features]
+        print(cols)
+        #patient_df = patient_df.loc[:, cols]
+        self.table_window = TableWindow(patient_df)
+        self.table_window.show()
+ 
 
 if __name__ == '__main__':
 
