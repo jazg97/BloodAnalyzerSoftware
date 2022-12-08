@@ -4,6 +4,8 @@ import os
 import matplotlib.pyplot as plt
 import sys
 import numpy as np
+from datetime import datetime
+import time
 
 root_dir = os.path.dirname(os.path.realpath(__file__))
 
@@ -29,6 +31,93 @@ def recursive_parsing(node, identifier='o', attrib_list=[], val_list=[], idef=''
             recursive_parsing(child, 'o', attrib_list, val_list, child.attrib)
 
     return attrib_list, val_list
+
+def parse_multiple_files(directory, progress_bar):
+    dict_list = []
+    for idx, file in enumerate(os.listdir(directory)):
+        progress_bar.setValue(idx+1)
+        tree = et.parse(os.path.join(directory, file))
+        root = tree.getroot()
+        attrib_list = []
+        val_list = []
+        attrib_list, val_list = recursive_parsing(root, 'o', attrib_list, val_list)
+        previous_string = ''
+        unit = dict()
+
+        for idy, val in enumerate(attrib_list):
+            string=''
+            try:
+                hist=False
+                thresh=False
+                for idz,key in enumerate(val.keys()):
+                    if idz>=1:
+                        string+='_'+val[key]
+                    else:
+                        string+=val[key]
+                    if val[key] == 'HISTOGRAM':
+                        hist=True
+                    if val[key] == 'THRESHOLDS':
+                        thresh=True
+                if hist and 'Flags':
+                    string = previous_string.split('_')[0]+'_'+string
+                    unit[string] = val_list[idy+1]
+                elif thresh:
+                    string = previous_string.split('_')[0]+'_'+string
+                    out = []
+                    n=1
+                    while True:
+                        if not attrib_list[idy+n]:
+                            out.append(val_list[idy+n])
+                        else:
+                            break
+                        n+=1
+                    unit[string] = (';').join(out)
+                elif 'Flags' in string and attrib_list[idy]['n'].lower()!='flags':
+                    pass
+                else:
+                    unit[string] = val_list[idy]
+                    string+=': '+val_list[idy]
+                previous_string = string
+            except:
+                pass
+        dict_list.append(unit)
+    out_df = pd.DataFrame.from_records(dict_list)
+    out_df = out_df.dropna(how='all', axis=1)
+    return out_df
+
+def clean_dataframe(dataframe):
+    copy = dataframe.copy()
+    
+    undesired_columns = ['ExpiredReagent', 'OPERATOR', 'PACKET_TYPE', 'QCFailed', 'SAMPLING_MODE', 'Archived', 'EOS#_EOS', 'ANALYSIS_TYPE', 'ANALYZER_NO', 'FIELD_SID_PATIENT_SEX', 'FIELD_SID_SAMPLE_TYPE', 'FIELD_SID_SESSIONID', 'VET_VERSION', 'XBDrift', 'CONCENTRATED_PLATELET']
+    dataframe = dataframe.drop('InvalidAlarmStartup', axis=1)
+    dataframe = dataframe.drop('InvalidQC', axis=1)
+    columns = dataframe.columns
+    selected = [column for column in columns if ('raw' in column.lower() or 'valid' in column.lower())]
+    
+    counts = [np.unique(dataframe[column], return_counts=True) for column in selected]
+    invalid_raw = [(column, np.unique(dataframe[column], return_counts=True)) for column in selected if 'raw' in column.lower()]
+    invalid_occ = [column for (column, counts) in invalid_raw if '--.--' in counts[0]]
+    invalid_rows = [np.where(dataframe[column] == '--.--') for column in invalid_occ]
+    indices = dataframe[dataframe[invalid_occ[0]] == '--.--'].index
+    dataframe.drop(indices, inplace=True)
+    
+    dataframe.loc[dataframe['FIELD_SID_OWNER_LASTNAME'].isnull(), 'FIELD_SID_OWNER_LASTNAME'] = 'GUEZGUEZ'
+    dataframe.loc[dataframe['FIELD_SID_OWNER_LASTNAME'].str.isnumeric(), 'FIELD_SID_OWNER_LASTNAME'] = 'GUEZGUEZ'
+    dataframe.loc[(dataframe['FIELD_SID_OWNER_LASTNAME'] !='SCHUPPAN') & (dataframe['FIELD_SID_OWNER_LASTNAME'] !='GUEZGUEZ'), 'FIELD_SID_ANIMAL_NAME'] =  dataframe.loc[(dataframe['FIELD_SID_OWNER_LASTNAME'] !='SCHUPPAN') & (dataframe['FIELD_SID_OWNER_LASTNAME'] !='GUEZGUEZ'), 'FIELD_SID_OWNER_LASTNAME']
+    dataframe.loc[(dataframe['FIELD_SID_OWNER_LASTNAME'] !='SCHUPPAN') & (dataframe['FIELD_SID_OWNER_LASTNAME'] !='GUEZGUEZ'), 'FIELD_SID_OWNER_LASTNAME'] = 'GUEZGUEZ'
+    dataframe.loc[dataframe['FIELD_SID_ANIMAL_NAME'].isnull(), 'FIELD_SID_ANIMAL_NAME'] = 'BLOOD'
+    dataframe.loc[(dataframe['FIELD_SID_ANIMAL_NAME'] == 'SPL') | (dataframe['FIELD_SID_ANIMAL_NAME'] == 'SP') , 'FIELD_SID_ANIMAL_NAME'] = 'SPLEEN'
+    
+    df = dataframe.copy()
+    for col in df:
+        unique = df[col].unique()
+        if df[col].isnull().all() or df[col].isna().all() or (len(unique) == 1 and unique[0] == '\n') or ('flag' in col.lower() and 'histogram' not in col.lower()) or '_Id' in col or 'Valid' in col or 'Unit' in col:
+            df = df.drop(col, axis=1)
+    
+    df = df.drop(undesired_columns, axis=1)
+    df['FIELD_SID_PATIENT_LAST_NAME'] = ''
+
+    return df
 
 def plot_rawdata(patient_id, feature, dataframe):
     patient_df = dataframe[dataframe['FIELD_SID_PATIENT_ID']==patient_id]

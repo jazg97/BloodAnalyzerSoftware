@@ -87,5 +87,5 @@ df['FIELD_SID_PATIENT_LAST_NAME'] = ''
 
 print('Number of removed columns:', len(set(list(og)) - set(list(df))))
 
-out_file = os.path.join(root_dir, 'tests', 'cleaned_data.csv')
+out_file = os.path.join(root_dir, 'tests', 'cleaned_data2.csv')
 df.to_csv(out_file)

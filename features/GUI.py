@@ -1,6 +1,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys
 import matplotlib
+from PIL import Image, ImageQt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg, NavigationToolbar2QT as NavigationToolbar
 matplotlib.use('Qt5Agg')
 from matplotlib.figure import Figure
@@ -73,8 +74,116 @@ class CheckableComboBox(QtWidgets.QComboBox):
 
         #print(self.selected_items)
 
+class InitialWindow(QtWidgets.QMainWindow):
+
+    signal = QtCore.pyqtSignal(str)
+    def __init__(self, *args, **kwargs):
+
+        super().__init__(*args, **kwargs)
+
+        location = os.path.dirname(os.path.realpath(__file__))
+
+        self.selected_file = None
+
+        myQWidget = QtWidgets.QWidget()
+
+        self.pix_map = QtGui.QPixmap(os.path.join(location, 'BloodAnalyzerLogo.png'))
+
+        self.image_label = QtWidgets.QLabel("")
+        self.image_label.setPixmap(self.pix_map)
+        self.image_label.setAlignment(QtCore.Qt.AlignCenter)
+
+        self.warning_label = QtWidgets.QLabel("Generating csv file...")
+        self.warning_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.warning_label.setVisible(False)
+
+        self.progress_bar = QtWidgets.QProgressBar(self)
+        self.progress_bar.setFixedWidth(450)
+        self.progress_bar.setFixedHeight(50)
+        self.progress_bar.setVisible(False)
+
+        self.new_label  = QtWidgets.QLabel("Start New Analysis")
+        self.new_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.new_button = QtWidgets.QPushButton("...")
+
+        self.load_label = QtWidgets.QLabel("Load csv file")
+        self.load_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.load_button = QtWidgets.QPushButton("...")
+
+        root_layout = QtWidgets.QVBoxLayout()
+        new_layout  = QtWidgets.QHBoxLayout()
+        load_layout = QtWidgets.QHBoxLayout()
+        second_row  = QtWidgets.QHBoxLayout()
+        third_row   = QtWidgets.QHBoxLayout()
+
+        myQWidget.setLayout(root_layout)
+        self.setCentralWidget(myQWidget)
+
+        new_layout.addWidget(self.new_label)
+        new_layout.addWidget(self.new_button)
+
+        load_layout.addWidget(self.load_label)
+        load_layout.addWidget(self.load_button)
+
+        second_row.addWidget(self.progress_bar)
+
+        third_row.addLayout(new_layout)
+        third_row.addLayout(load_layout)
+
+        root_layout.addWidget(self.image_label)
+        root_layout.addWidget(self.warning_label)
+        root_layout.addLayout(second_row)
+        root_layout.addLayout(third_row)
+
+        self.new_button.clicked.connect(self.choose_directory)
+        self.load_button.clicked.connect(self.choose_file)
+
+        self.setFixedWidth(900)
+        self.setFixedHeight(680)
+
+    def choose_directory(self):
+
+        directory = QtWidgets.QFileDialog.getExistingDirectory(self, "Select a folder", os.path.dirname(os.path.abspath(__file__)))
+
+        if directory != '':
+            self.warning_label.setVisible(True)
+            self.progress_bar.setVisible(True)
+            self.generate_csv(directory)
+
+    def generate_csv(self, directory):
+
+        self.progress_bar.setMinimum(0)
+        self.progress_bar.setMaximum(len(os.listdir(directory)))
+
+        current_date = ''.join(str(datetime.now()).split(' ')[0].split('-'))
+
+        out_name = 'analysis_'+current_date+'.csv'
+
+        location = os.path.dirname(os.path.realpath(__file__))
+
+        out_name = os.path.join(location, out_name)
+
+        raw_df = parse_multiple_files(directory, self.progress_bar)
+        
+        clean_df = clean_dataframe(raw_df)
+
+        clean_df.to_csv(out_name)
+
+        self.selected_file = out_name
+        self.signal.emit('Closed')
+        self.close()
+            
+    def choose_file(self):
+
+        file, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Select a file", os.path.dirname(os.path.abspath(__file__)), "Comma-separated values (*.csv)")
+
+        if file !='':
+            self.selected_file = file
+            self.signal.emit('Closed')
+            self.close()
+
 #Class wrapper for Dialog test window
-class Dialog(QtWidgets.QMainWindow):
+class SecondWindow(QtWidgets.QMainWindow):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -251,11 +360,30 @@ class Dialog(QtWidgets.QMainWindow):
         #patient_df = patient_df.loc[:, cols]
         self.table_window = TableWindow(patient_df)
         self.table_window.show()
- 
+
+class ScreenHandler(QtWidgets.QMainWindow):
+
+    def __init__(self):
+
+        super().__init__()
+
+        self.first_window = InitialWindow()
+        self.second_window = SecondWindow()
+
+        self.first_window.signal.connect(self.change_window)
+
+        self.first_window.show()
+
+    @QtCore.pyqtSlot(str)
+    def change_window(self, event):
+        self.second_window.show()
 
 if __name__ == '__main__':
 
     app = QtWidgets.QApplication(['Test'])
-    dialog_1 = Dialog()
-    dialog_1.show()
+    main_widget = ScreenHandler()
+
+    #dialog_1 = Dialog()
+    #dialog_1.show()
+    
     app.exec_()
