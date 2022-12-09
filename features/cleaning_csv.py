@@ -64,7 +64,7 @@ df = dataframe.copy()
 
 for col in df:
     unique = df[col].unique()
-    if df[col].isnull().all() or df[col].isna().all() or (len(unique) == 1 and unique[0] == '\n') or ('flag' in col.lower() and 'histogram' not in col.lower()) or '_Id' in col or 'Valid' in col or 'Unit' in col:
+    if df[col].isnull().all() or df[col].isna().all() or (len(unique) == 1 and unique[0] == '\n') or ('flag' in col.lower() and 'histogram' not in col.lower()) or '_Id' in col or 'Valid' in col or 'Unit' in col or 'Raw' in col:
         df = df.drop(col, axis=1)
 
 dr_columns = pd.read_csv(os.path.join(root_dir, 'tests', 'columns_to_drop.csv'))
@@ -87,5 +87,5 @@ df['FIELD_SID_PATIENT_LAST_NAME'] = ''
 
 print('Number of removed columns:', len(set(list(og)) - set(list(df))))
 
-out_file = os.path.join(root_dir, 'tests', 'cleaned_data2.csv')
-df.to_csv(out_file)
+out_file = os.path.join(root_dir, 'tests', 'cleaned_data3.csv')
+df.to_csv(out_file, index=False)

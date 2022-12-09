@@ -184,15 +184,16 @@ class InitialWindow(QtWidgets.QMainWindow):
 
 #Class wrapper for Dialog test window
 class SecondWindow(QtWidgets.QMainWindow):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, filename, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        location = '\\'.join(os.path.dirname(os.path.realpath(__file__)).split('\\')[:-1])
+        self.root = '\\'.join(os.path.dirname(os.path.realpath(__file__)).split('\\')[:-1])
 
-        self.dataframe = pd.read_csv(os.path.join(location,'tests','cleaned_data.csv'))
+        self.filename = filename
+        self.dataframe = pd.read_csv(self.filename)
         self.unique_ids = np.unique(self.dataframe['FIELD_SID_PATIENT_ID'].values)
 
-        self.features = sorted([column.split('_')[0] for column in self.dataframe.columns if 'Raw' in column])
+        self.features = sorted([column.split('_')[0] for column in self.dataframe.columns if 'Value' in column])
 
         root_layout = QtWidgets.QVBoxLayout()
         myQWidget = QtWidgets.QWidget()
@@ -253,6 +254,9 @@ class SecondWindow(QtWidgets.QMainWindow):
         self.df_button = QtWidgets.QPushButton('Show Dataframe')
         self.table_window= None
         #self.df_button.setFont(font)
+
+        self.export_button = QtWidgets.QPushButton('Export Selected Data')
+        self.selected_frame = None
         
         first_row.addWidget(self.id_box)
         first_row.addWidget(self.test_box)
@@ -261,6 +265,7 @@ class SecondWindow(QtWidgets.QMainWindow):
         second_row.addWidget(self.toolbar)
         second_row.addWidget(self.date_box)
         second_row.addWidget(self.df_button)
+        second_row.addWidget(self.export_button)
         second_row.addStretch()
         self.date_box.setVisible(False)
         root_layout.addLayout(first_row)
@@ -268,9 +273,12 @@ class SecondWindow(QtWidgets.QMainWindow):
         root_layout.addWidget(self.canvas)
         self.toolbar.setVisible(False)
         self.df_button.setVisible(False)
+        self.export_button.setVisible(False)
         self.canvas.setVisible(False)
         self.plot_button.clicked.connect(self.gen_plot)
         self.df_button.clicked.connect(self.show_dataframe)
+        self.export_button.clicked.connect(self.export_dataframe)
+        
 
     def gen_plot(self):
         print("Selected Patients:", self.id_box.selected_items)
@@ -287,6 +295,7 @@ class SecondWindow(QtWidgets.QMainWindow):
         self.canvas.setVisible(True)
         self.date_box.setVisible(True)
         self.df_button.setVisible(True)
+        self.export_button.setVisible(True)
         self.canvas.fig.clf()
         self.canvas.axs = []
         axis = None
@@ -297,7 +306,7 @@ class SecondWindow(QtWidgets.QMainWindow):
                 axis = self.canvas.fig.add_subplot(1,1,idx+1)
             else:
                 axis = self.canvas.fig.add_subplot(2,int(np.ceil(len(features)/2)),idx+1)
-            raw_feature = feature + '_Raw'
+            raw_feature = feature + '_Value'
             #print(raw_feature)
             data = []
             datepoints = []
@@ -355,11 +364,27 @@ class SecondWindow(QtWidgets.QMainWindow):
             #print(patient_df)
         else:
             patient_df = self.dataframe[(self.dataframe['FIELD_SID_PATIENT_ID'].str.contains('|'.join(patient_ids), case=True)) & (self.dataframe['FIELD_SID_ANIMAL_NAME'].isin(tests))]
-        cols = [col for col in patient_df.columns if col in features]
-        print(cols)
-        #patient_df = patient_df.loc[:, cols]
-        self.table_window = TableWindow(patient_df)
+        self.selected_frame = patient_df
+        self.table_window = TableWindow(self.selected_frame)
         self.table_window.show()
+        
+    def export_dataframe(self):
+        patient_ids = [patient.split(' ')[-1] for patient in self.id_box.selected_items]
+        features = self.feature_box.selected_items
+        tests = self.test_box.selected_items
+        selected_dates = self.date_box.selected_items
+        if selected_dates:
+            patient_df = self.dataframe[(self.dataframe['FIELD_SID_PATIENT_ID'].str.contains('|'.join(patient_ids), case=True)) & (self.dataframe['FIELD_SID_ANIMAL_NAME'].isin(tests)) & (self.dataframe['ANALYSIS_DATE'].str.contains('|'.join(selected_dates), case=True))]
+            #self.dataframe['ANALYSIS_DATE'].isin(selected_dates)
+            #print(patient_df)
+        else:
+            patient_df = self.dataframe[(self.dataframe['FIELD_SID_PATIENT_ID'].str.contains('|'.join(patient_ids), case=True)) & (self.dataframe['FIELD_SID_ANIMAL_NAME'].isin(tests))]
+        self.selected_frame = patient_df
+        filename = os.path.join(self.root,'tests', 'selected_data.csv')
+        self.selected_frame.to_csv(filename, index=False)
+        #current_date = str(datetime())
+        
+        
 
 class ScreenHandler(QtWidgets.QMainWindow):
 
@@ -368,7 +393,7 @@ class ScreenHandler(QtWidgets.QMainWindow):
         super().__init__()
 
         self.first_window = InitialWindow()
-        self.second_window = SecondWindow()
+        self.second_window = None
 
         self.first_window.signal.connect(self.change_window)
 
@@ -376,6 +401,8 @@ class ScreenHandler(QtWidgets.QMainWindow):
 
     @QtCore.pyqtSlot(str)
     def change_window(self, event):
+        print(self.first_window.selected_file)
+        self.second_window = SecondWindow(self.first_window.selected_file)
         self.second_window.show()
 
 if __name__ == '__main__':

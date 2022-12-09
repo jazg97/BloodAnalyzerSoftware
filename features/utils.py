@@ -111,7 +111,7 @@ def clean_dataframe(dataframe):
     df = dataframe.copy()
     for col in df:
         unique = df[col].unique()
-        if df[col].isnull().all() or df[col].isna().all() or (len(unique) == 1 and unique[0] == '\n') or ('flag' in col.lower() and 'histogram' not in col.lower()) or '_Id' in col or 'Valid' in col or 'Unit' in col:
+        if df[col].isnull().all() or df[col].isna().all() or (len(unique) == 1 and unique[0] == '\n') or ('flag' in col.lower() and 'histogram' not in col.lower()) or '_Id' in col or 'Valid' in col or 'Raw' in col or 'Unit' in col:
             df = df.drop(col, axis=1)
     
     df = df.drop(undesired_columns, axis=1)
