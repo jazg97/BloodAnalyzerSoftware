@@ -14,6 +14,10 @@ PLT = ['MPV','PLT']
 RBC = ['HCT', 'HBG', 'MCH', 'MCHC', 'MCV', 'RBC', 'RDW']
 WBC = ['EOS%', 'EOS#', 'GRA%', 'GRA#', 'LYM%', 'LYM#', 'MON%', 'MON#', 'WBC']
 
+family_dict = {'PLT FAMILY': PLT, 'RBC FAMILY': RBC, 'WBC FAMILY': WBC}
+
+families = ['PLT FAMILY', 'RBC FAMILY', 'WBC FAMILY']
+
 #Class wrapper for Canvas and Plotting Capabilities
 class MplCanvas(FigureCanvasQTAgg):
     def __init__(self, parent=None, width=12, height=9, dpi=100, axes=1):
@@ -167,7 +171,7 @@ class InitialWindow(QtWidgets.QMainWindow):
         
         clean_df = clean_dataframe(raw_df)
 
-        clean_df.to_csv(out_name)
+        clean_df.to_csv(out_name, index=False)
 
         self.selected_file = out_name
         self.signal.emit('Closed')
@@ -239,8 +243,8 @@ class SecondWindow(QtWidgets.QMainWindow):
         self.feature_box = CheckableComboBox()
         self.feature_box.model().setItem(0,0,self.feature_label)
         self.feature_box.lineEdit().setText("----- Select Feature(s) -----")
-        for i in range(len(self.features)):
-            self.feature_box.addItem('%s'% self.features[i])
+        for i in range(len(families)):
+            self.feature_box.addItem('%s'% families[i])
             item = self.feature_box.model().item(i+1,0)
             item.setCheckState(QtCore.Qt.Unchecked)
 
@@ -257,6 +261,8 @@ class SecondWindow(QtWidgets.QMainWindow):
 
         self.export_button = QtWidgets.QPushButton('Export Selected Data')
         self.selected_frame = None
+
+        self.import_button = QtWidgets.QPushButton('Import Metadata')
         
         first_row.addWidget(self.id_box)
         first_row.addWidget(self.test_box)
@@ -266,6 +272,7 @@ class SecondWindow(QtWidgets.QMainWindow):
         second_row.addWidget(self.date_box)
         second_row.addWidget(self.df_button)
         second_row.addWidget(self.export_button)
+        second_row.addWidget(self.import_button)
         second_row.addStretch()
         self.date_box.setVisible(False)
         root_layout.addLayout(first_row)
@@ -274,44 +281,52 @@ class SecondWindow(QtWidgets.QMainWindow):
         self.toolbar.setVisible(False)
         self.df_button.setVisible(False)
         self.export_button.setVisible(False)
+        self.import_button.setVisible(False)
         self.canvas.setVisible(False)
         self.plot_button.clicked.connect(self.gen_plot)
         self.df_button.clicked.connect(self.show_dataframe)
         self.export_button.clicked.connect(self.export_dataframe)
-        
+        self.import_button.clicked.connect(self.import_data)        
 
     def gen_plot(self):
         print("Selected Patients:", self.id_box.selected_items)
-        print("Selected Features:", self.feature_box.selected_items)
+        print("Selected Family:", self.feature_box.selected_items)
         print("Selected Tests:", self.test_box.selected_items)
         
         patient_ids = self.id_box.selected_items
-        features = self.feature_box.selected_items
+        family = self.feature_box.selected_items
         tests = self.test_box.selected_items
         selected_dates = self.date_box.selected_items
         if selected_dates:
             print("Selected Dates:", selected_dates)
+        
         self.toolbar.setVisible(True)
         self.canvas.setVisible(True)
         self.date_box.setVisible(True)
         self.df_button.setVisible(True)
         self.export_button.setVisible(True)
+        self.import_button.setVisible(True)
         self.canvas.fig.clf()
         self.canvas.axs = []
         axis = None
 
+        features = family_dict[family[0]]
+
+        print(features)
+
         for idx,feature in enumerate(features):
             self.canvas.axs.append(axis)
-            if len(features) ==1:
-                axis = self.canvas.fig.add_subplot(1,1,idx+1)
+            if family[0] =='WBC FAMILY':
+                axis = self.canvas.fig.add_subplot(3,3,idx+1)
             else:
                 axis = self.canvas.fig.add_subplot(2,int(np.ceil(len(features)/2)),idx+1)
             raw_feature = feature + '_Value'
-            #print(raw_feature)
+            print(raw_feature)
             data = []
             datepoints = []
             for patient in patient_ids:
                 patient = patient.split(' ')[-1]
+                #print(patient)
                 if selected_dates:
                     patient_df = self.dataframe[(self.dataframe['FIELD_SID_PATIENT_ID']==patient) & (self.dataframe['FIELD_SID_ANIMAL_NAME'].isin(tests)) & (self.dataframe['ANALYSIS_DATE'].str.contains('|'.join(selected_dates), case=True))]
                     #self.dataframe['ANALYSIS_DATE'].isin(selected_dates)
@@ -383,7 +398,28 @@ class SecondWindow(QtWidgets.QMainWindow):
         filename = os.path.join(self.root,'tests', 'selected_data.csv')
         self.selected_frame.to_csv(filename, index=False)
         #current_date = str(datetime())
-        
+
+    def import_data(self):
+        file, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Select a file", os.path.dirname(os.path.abspath(__file__)), "Comma-separated values (*.csv *.xlsx)")
+
+        if file.split('.')[-1]=='csv':
+            print('csv')
+            metadata = pd.read_csv(file)
+        else:
+            print('xlsx')
+            excel = pd.ExcelFile(file)
+            metadata = excel.parse()
+
+        patient_ids = [str(animal_id) for animal_id in metadata['animal_id'].values]
+        #selected_df = self.dataframe[(self.dataframe['FIELD_SID_PATIENT_ID'].str.contains('|'.join(patient_ids), case=True))]
+        for col in metadata.columns[1:]:
+            uniques = metadata[col].unique()
+            self.dataframe[col]=''
+            for idx, patient in enumerate(patient_ids):
+                self.dataframe.loc[self.dataframe['FIELD_SID_PATIENT_ID'].str.contains(patient), col]= metadata[metadata['animal_id']==int(patient)][col].values[0]
+                
+
+            
         
 
 class ScreenHandler(QtWidgets.QMainWindow):

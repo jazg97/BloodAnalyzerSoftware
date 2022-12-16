@@ -133,7 +133,7 @@ def plot_rawdata(patient_id, feature, dataframe):
     plt.axhline(y = limits[0], label='LowLimit', ls='-.', c='r')
     plt.axhline(y = limits[1], label='HighLimit', ls='-.', c='r')
     plt.legend()
-    plt.savefig(os.path.join(root_dir,'figures',patient_id+'_'+feature+'.png'), dpi=300)
+    #plt.savefig(os.path.join(root_dir,'figures',patient_id+'_'+feature+'.png'), dpi=300)
     plt.show()
 
 def subplot_feature(patient_ids, feature, canvas, axis, dataframe):
