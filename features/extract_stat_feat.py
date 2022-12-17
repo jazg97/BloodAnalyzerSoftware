@@ -41,23 +41,25 @@ else:
     column = filt[0]
     uniques = selected_df[column].unique()
 
-figure = plt.figure()
+figure = plt.figure(figsize=(12,8), constrained_layout=True)
 filtered_df = selected_df[selected_df['FIELD_SID_ANIMAL_NAME']==test]
 idxs = [np.where(filtered_df[column].values == unique) for unique in uniques]
 
 wd = 0.3
-x_pos = np.arange(1, 2*len(uniques), 2)
+x_pos = 0.5
 
 for idx,feature in enumerate(features):
-    axis = figure.add_subplot(2,int(np.ceil(len(features)/2)),idx+1)
-    for idx, group_idxs in enumerate(idxs):
+    axis = figure.add_subplot(3,3,idx+1)
+    for idy, group_idxs in enumerate(idxs):
         series = filtered_df[feature].values[group_idxs]
-        axis.bar(x_pos[idx]+idx*wd, np.mean(series), yerr=np.std(series), align='center', alpha=0.5, ecolor='black', capsize=10, label=uniques[idx])
+        axis.bar(x_pos+idy*wd, np.mean(series), width=wd, yerr=np.std(series), align='center', alpha=0.5, ecolor='black', capsize=10, label=uniques[idy])
         #axis.set_xlabel('&'.join(filt))
         axis.set_ylabel(feature)
-        axis.legend()
+        #axis.legend()
+
+handles, labels = axis.get_legend_handles_labels()
 figure.suptitle('&'.join(filt))
-figure.tight_layout()
+figure.legend(handles, labels, loc='upper left')
 plt.show()
 
 figure2 = plt.figure(figsize=(12,8), constrained_layout=True)
@@ -93,8 +95,10 @@ for idy, feature in enumerate(features):
     axis.set_ylabel(feature)
     #axis.set_xlabel('Date')
     axis.set_xticks(x_pos+wd, unique_dates)
-    axis.legend()
+    #axis.legend()
+handles, labels = axis.get_legend_handles_labels()
 figure2.suptitle('WBC FAMILY & METADATA')
 figure2.autofmt_xdate()
+figure2.legend(handles, labels, loc='upper left')
 #figure2.tight_layout()
 plt.show()
