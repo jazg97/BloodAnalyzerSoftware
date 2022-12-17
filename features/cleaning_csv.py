@@ -60,6 +60,10 @@ dataframe.loc[dataframe['FIELD_SID_ANIMAL_NAME'].isnull(), 'FIELD_SID_ANIMAL_NAM
 
 dataframe.loc[(dataframe['FIELD_SID_ANIMAL_NAME'] == 'SPL') | (dataframe['FIELD_SID_ANIMAL_NAME'] == 'SP') , 'FIELD_SID_ANIMAL_NAME'] = 'SPLEEN'
 
+dataframe.loc[dataframe['FIELD_SID_PATIENT_ID'].str.contains('|'.join(['SPL','SP']), case=True), 'FIELD_SID_ANIMAL_NAME'] = 'SPLEEN'
+
+#dateframe.loc[dataframe['FIELD_SID_PATIENT_ID'].str.contains('|'.join(['SPL','SP']), case=True), 'FIELD_SID_PATIENT_ID'] = 'SPLEEN'
+
 df = dataframe.copy()
 
 for col in df:

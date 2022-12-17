@@ -10,8 +10,12 @@ plt.style.use('ggplot')
 import numpy as np
 from utils import *
 
+plt.rcParams['axes.xmargin'] = 0
+plt.rcParams['axes.ymargin'] = 0
+#plt.rcParams['figure.constrained_layout.use'] = True
+
 PLT = ['MPV','PLT']
-RBC = ['HCT', 'HBG', 'MCH', 'MCHC', 'MCV', 'RBC', 'RDW']
+RBC = ['HCT', 'HGB', 'MCH', 'MCHC', 'MCV', 'RBC', 'RDW']
 WBC = ['EOS%', 'EOS#', 'GRA%', 'GRA#', 'LYM%', 'LYM#', 'MON%', 'MON#', 'WBC']
 
 family_dict = {'PLT FAMILY': PLT, 'RBC FAMILY': RBC, 'WBC FAMILY': WBC}
@@ -255,6 +259,13 @@ class SecondWindow(QtWidgets.QMainWindow):
         self.date_box.model().setItem(0,0,self.date_label)
         self.date_box.lineEdit().setText("----- Select/Deselect Dates ------")
 
+        self.imported_label = QtGui.QStandardItem("----- Select Imported Metadata(s) -----")
+        self.imported_label.setBackground(QtGui.QBrush(QtGui.QColor(150,200,120)))
+        self.imported_label.setSelectable(False)
+        self.imported_box = CheckableComboBox()
+        self.imported_box.model().setItem(0,0,self.imported_label)
+        self.import_box.lineEdit().setText("----- Select Imported Metadata(s) -----")
+
         self.df_button = QtWidgets.QPushButton('Show Dataframe')
         self.table_window= None
         #self.df_button.setFont(font)
@@ -353,10 +364,13 @@ class SecondWindow(QtWidgets.QMainWindow):
 
             axis.set_xlabel('Date')
             axis.set_ylabel(feature)
-            axis.title.set_text(raw_feature +' Timeseries')
+            #axis.title.set_text(raw_feature +' Timeseries')
             axis.set_ylim(min_value-1, max_value+2)
-            axis.margins(0)
+            #axis.margins(0)
             axis.legend()
+            #plt.subplots_adjust(left=0, bottom=0.1, right=0, top=0.2)
+        #self.canvas.fig.tight_layout()
+        self.canvas.fig.suptitle(t = family[0] + " Time-series", fontsize = 24, y=0.95)
         self.canvas.draw()
 
         for i in range(len(unique_dates)):
@@ -417,11 +431,8 @@ class SecondWindow(QtWidgets.QMainWindow):
             self.dataframe[col]=''
             for idx, patient in enumerate(patient_ids):
                 self.dataframe.loc[self.dataframe['FIELD_SID_PATIENT_ID'].str.contains(patient), col]= metadata[metadata['animal_id']==int(patient)][col].values[0]
-                
 
-            
-        
-
+    
 class ScreenHandler(QtWidgets.QMainWindow):
 
     def __init__(self):
