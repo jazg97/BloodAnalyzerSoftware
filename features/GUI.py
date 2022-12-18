@@ -262,9 +262,10 @@ class SecondWindow(QtWidgets.QMainWindow):
         self.imported_label = QtGui.QStandardItem("----- Select Imported Metadata(s) -----")
         self.imported_label.setBackground(QtGui.QBrush(QtGui.QColor(150,200,120)))
         self.imported_label.setSelectable(False)
+        
         self.imported_box = CheckableComboBox()
         self.imported_box.model().setItem(0,0,self.imported_label)
-        self.import_box.lineEdit().setText("----- Select Imported Metadata(s) -----")
+        self.imported_box.lineEdit().setText("----- Select Imported Metadata(s) -----")
 
         self.df_button = QtWidgets.QPushButton('Show Dataframe')
         self.table_window= None
@@ -274,6 +275,19 @@ class SecondWindow(QtWidgets.QMainWindow):
         self.selected_frame = None
 
         self.import_button = QtWidgets.QPushButton('Import Metadata')
+        self.metadata = None
+
+        self.global_radio = QtWidgets.QRadioButton('Global Metrics')
+        self.global_radio.setChecked(False)
+        self.time_radio   = QtWidgets.QRadioButton('Time-based Metrics')
+        self.time_radio.setChecked(False)
+
+        self.stat_button = QtWidgets.QPushButton('Generate Box-Plot')
+
+        self.contained_box = QtWidgets.QHBoxLayout()
+        self.contained_box.addWidget(self.global_radio)
+        self.contained_box.addWidget(self.time_radio)
+        self.contained_box.addWidget(self.stat_button)
         
         first_row.addWidget(self.id_box)
         first_row.addWidget(self.test_box)
@@ -284,7 +298,10 @@ class SecondWindow(QtWidgets.QMainWindow):
         second_row.addWidget(self.df_button)
         second_row.addWidget(self.export_button)
         second_row.addWidget(self.import_button)
+        second_row.addWidget(self.imported_box)
+        second_row.addLayout(self.contained_box)
         second_row.addStretch()
+        
         self.date_box.setVisible(False)
         root_layout.addLayout(first_row)
         root_layout.addLayout(second_row)
@@ -293,11 +310,17 @@ class SecondWindow(QtWidgets.QMainWindow):
         self.df_button.setVisible(False)
         self.export_button.setVisible(False)
         self.import_button.setVisible(False)
+        self.imported_box.setVisible(False)
         self.canvas.setVisible(False)
+        self.global_radio.setVisible(False)
+        self.time_radio.setVisible(False)
+        self.stat_button.setVisible(False)
+        
         self.plot_button.clicked.connect(self.gen_plot)
         self.df_button.clicked.connect(self.show_dataframe)
         self.export_button.clicked.connect(self.export_dataframe)
-        self.import_button.clicked.connect(self.import_data)        
+        self.import_button.clicked.connect(self.import_data)
+        self.stat_button.clicked.connect(self.generate_boxplot)
 
     def gen_plot(self):
         print("Selected Patients:", self.id_box.selected_items)
@@ -424,14 +447,108 @@ class SecondWindow(QtWidgets.QMainWindow):
             excel = pd.ExcelFile(file)
             metadata = excel.parse()
 
+        self.metadata = metadata
         patient_ids = [str(animal_id) for animal_id in metadata['animal_id'].values]
         #selected_df = self.dataframe[(self.dataframe['FIELD_SID_PATIENT_ID'].str.contains('|'.join(patient_ids), case=True))]
-        for col in metadata.columns[1:]:
+        for i,col in enumerate(metadata.columns[1:]):
             uniques = metadata[col].unique()
             self.dataframe[col]=''
             for idx, patient in enumerate(patient_ids):
                 self.dataframe.loc[self.dataframe['FIELD_SID_PATIENT_ID'].str.contains(patient), col]= metadata[metadata['animal_id']==int(patient)][col].values[0]
+            self.imported_box.addItem('%s'% col)
+            item = self.imported_box.model().item(i+1,0)
+            item.setCheckState(QtCore.Qt.Unchecked)
+        self.imported_box.setVisible(True)
+        self.global_radio.setVisible(True)
+        self.time_radio.setVisible(True)
+        self.stat_button.setVisible(True)
 
+    def generate_boxplot(self):
+
+        family = self.feature_box.selected_items
+        tests = self.test_box.selected_items
+        
+        meta_patients = [str(animal_id) for animal_id in self.metadata['animal_id'].values]
+        #print(meta_patients)(self.dataframe['FIELD_SID_PATIENT_ID'].str.contains('|'.join(meta_patients), case=True))
+
+        selected_df = self.dataframe[(self.dataframe['FIELD_SID_PATIENT_ID'].str.contains('|'.join(meta_patients), case=True)) & (self.dataframe['FIELD_SID_ANIMAL_NAME'].isin(tests))]
+
+        #print(selected_df)
+        
+        filters = self.imported_box.selected_items
+
+        #print(filters)
+        
+        if len(filters)>1:
+            column = '-'.join(filters)
+            selected_df[column] = selected_df[filters].apply(lambda x: '_'.join(x), axis=1)
+            uniques = selected_df[column].unique()
+        else:
+            column = filters[0]
+            uniques = selected_df[column].unique()
+        
+        groupings = [np.where(selected_df[column].values==unique) for unique in uniques]
+
+        wd = 0.5
+        self.canvas.fig.clf()
+        self.canvas.axs = []
+        axis = None
+
+        #print('A')
+        features = family_dict[family[0]]
+        
+        if self.global_radio.isChecked():
+            print('Global')
+            x_pos = 0.5
+            for idx, feature in enumerate(features):
+                if family[0] =='WBC FAMILY':
+                    axis = self.canvas.fig.add_subplot(3,3,idx+1)
+                else:
+                    axis = self.canvas.fig.add_subplot(2,int(np.ceil(len(features)/2)),idx+1)
+                for idy, group in enumerate(groupings):
+                    series = filtered_df[feature].values[group]
+                    axis.bar(x_pos+idy*wd, np.mean(series), width=wd, yerr=np.std(series), align='center', alpha=0.5, ecolor='black', capsize=6, label=uniques[idy])
+                    axis.set_ylabel(feature)    
+            
+        elif self.time_radio.isChecked():
+            print('Time-based')
+            unique_dates = selected_df['ANALYSIS_DATE'].apply(lambda x: x.plit(' ')[0]).unique()
+
+            means = []
+            stds  = []#lol
+            for idx, date in enumerate(unique_dates):
+                selected_perdate = selected_df[selected_df['ANALYSIS_DATE'].str.contains(date)]
+                groupings = [np.where(selected_perdate[column].values == unique) for unique in uniques]
+                mean_perdate = []
+                std_perdate = []
+                for idy, group in enumerate(groupings):
+                    mean_pergroup = np.mean(selected_perdate[features].values[group], axis=0)
+                    std_pergroup =  np.std(selected_perdate[features].values[group], axis=0)
+                    mean_perdate.append(mean_pergroup)
+                    std_perdate.append(std_pergroup)
+                means.append(np.vstack(mean_perdate))
+                stds.append(np.vstack(std_perdate))
+            means = np.array(means)
+            stds = np.array(stds)
+
+            x_pos = np.arange(1,2*len(unique_dates), 2)
+
+            for idx, feature in enumerate(features):
+                if family[0] =='WBC FAMILY':
+                    axis = self.canvas.fig.add_subplot(3,3,idx+1)
+                else:
+                    axis = self.canvas.fig.add_subplot(2,int(np.ceil(len(features)/2)),idx+1)
+                [axis.bar(x_pos+i*wd, means[:,i,idx], yerr=stds[:,i,idy], width=wd, alpha=0.5, ecolor='black', capsize=6, label=uniques[i]) for i in range(means.shape[1])]
+                axis.set_ylabel(feature)
+                axis.set_xticks(x_pos+wd, unique_dates)
+        else:
+            pass
+        print('F')
+        handles, labels = axis.get_legend_handles()
+        self.canvas.fig.legend(handles,labels, loc='upper left')
+        self.canvas.fig.suptitle(family[0]+' & METADATA')
+        #self.canvas.fig.autofmt_xdate()#Comment if plotting fails
+        self.canvas.draw()        
     
 class ScreenHandler(QtWidgets.QMainWindow):
 
