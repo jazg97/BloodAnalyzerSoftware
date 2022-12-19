@@ -489,6 +489,8 @@ class SecondWindow(QtWidgets.QMainWindow):
         
         groupings = [np.where(selected_df[column].values==unique) for unique in uniques]
 
+        #print(groupings)
+
         wd = 0.5
         self.canvas.fig.clf()
         self.canvas.axs = []
@@ -496,7 +498,7 @@ class SecondWindow(QtWidgets.QMainWindow):
 
         #print('A')
         features = family_dict[family[0]]
-        
+        features = [feature+'_Value' for feature in features]
         if self.global_radio.isChecked():
             print('Global')
             x_pos = 0.5
@@ -505,14 +507,16 @@ class SecondWindow(QtWidgets.QMainWindow):
                     axis = self.canvas.fig.add_subplot(3,3,idx+1)
                 else:
                     axis = self.canvas.fig.add_subplot(2,int(np.ceil(len(features)/2)),idx+1)
+
+                #print('B')
                 for idy, group in enumerate(groupings):
-                    series = filtered_df[feature].values[group]
-                    axis.bar(x_pos+idy*wd, np.mean(series), width=wd, yerr=np.std(series), align='center', alpha=0.5, ecolor='black', capsize=6, label=uniques[idy])
-                    axis.set_ylabel(feature)    
+                    series = selected_df[feature].values[group]
+                    axis.bar(x_pos+idy*wd, np.mean(series), width=wd, yerr=np.std(series), alpha=0.5, ecolor='black', capsize=6, label=uniques[idy])
+                    axis.set_ylabel(feature)
             
         elif self.time_radio.isChecked():
             print('Time-based')
-            unique_dates = selected_df['ANALYSIS_DATE'].apply(lambda x: x.plit(' ')[0]).unique()
+            unique_dates = selected_df['ANALYSIS_DATE'].apply(lambda x: x.split(' ')[0]).unique()
 
             means = []
             stds  = []#lol
@@ -538,29 +542,26 @@ class SecondWindow(QtWidgets.QMainWindow):
                     axis = self.canvas.fig.add_subplot(3,3,idx+1)
                 else:
                     axis = self.canvas.fig.add_subplot(2,int(np.ceil(len(features)/2)),idx+1)
-                [axis.bar(x_pos+i*wd, means[:,i,idx], yerr=stds[:,i,idy], width=wd, alpha=0.5, ecolor='black', capsize=6, label=uniques[i]) for i in range(means.shape[1])]
+                [axis.bar(x_pos+i*wd, means[:,i,idx], yerr=stds[:,i,idx], width=wd, alpha=0.5, ecolor='black', capsize=6, label=uniques[i]) for i in range(means.shape[1])]
                 axis.set_ylabel(feature)
                 axis.set_xticks(x_pos+wd, unique_dates)
+            self.canvas.fig.autofmt_xdate()#Comment if plotting fails
         else:
             pass
-        print('F')
-        handles, labels = axis.get_legend_handles()
+        #print('F')
+        handles, labels = axis.get_legend_handles_labels()
         self.canvas.fig.legend(handles,labels, loc='upper left')
-        self.canvas.fig.suptitle(family[0]+' & METADATA')
-        #self.canvas.fig.autofmt_xdate()#Comment if plotting fails
-        self.canvas.draw()        
+        #self.canvas.fig.suptitle(family[0]+' & METADATA')     
+        self.canvas.draw()
     
 class ScreenHandler(QtWidgets.QMainWindow):
 
     def __init__(self):
 
         super().__init__()
-
         self.first_window = InitialWindow()
         self.second_window = None
-
         self.first_window.signal.connect(self.change_window)
-
         self.first_window.show()
 
     @QtCore.pyqtSlot(str)

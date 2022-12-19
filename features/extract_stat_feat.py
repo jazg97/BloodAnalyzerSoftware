@@ -31,7 +31,7 @@ features = ['EOS%_Value', 'EOS#_Value', 'GRA%_Value', 'GRA#_Value', 'LYM%_Value'
 
 test = 'BLOOD'
 
-filt = ['Genotype']#'Treatment']#,
+filt = ['Genotype','Treatment']#]#,
 
 if len(filt)>1:
     column = '-'.join(filt)
