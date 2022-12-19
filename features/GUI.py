@@ -309,7 +309,7 @@ class SecondWindow(QtWidgets.QMainWindow):
         self.toolbar.setVisible(False)
         self.df_button.setVisible(False)
         self.export_button.setVisible(False)
-        self.import_button.setVisible(False)
+        #self.import_button.setVisible(False)
         self.imported_box.setVisible(False)
         self.canvas.setVisible(False)
         self.global_radio.setVisible(False)
@@ -464,6 +464,11 @@ class SecondWindow(QtWidgets.QMainWindow):
         self.stat_button.setVisible(True)
 
     def generate_boxplot(self):
+
+        self.toolbar.setVisible(True)
+        self.canvas.setVisible(True)
+        self.df_button.setVisible(True)
+        self.export_button.setVisible(True)
 
         family = self.feature_box.selected_items
         tests = self.test_box.selected_items
