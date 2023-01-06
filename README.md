@@ -92,7 +92,16 @@ The project has the following structure:
                 
 ## Features
 
+The Blood Analyzer Software (B.A.S.) is an data visualization and explorative tool, consequently most of its features are related to these tasks.
 
+1. Generate new csv file
+2. Plot time-series by feature family and patients' ID
+3. Import metadata
+4. Generate boxplot with imported metadata keys
+	4.1. Global plot
+	4.2. Boxplot time-series
+5. Extract statistical features
+6. Export selected data
 
 ```py
 
@@ -101,6 +110,13 @@ The project has the following structure:
 ## Examples
 
 These are some common usage examples.
+
+1. New Analysis
+
+1.1. Start new analysis
+1.2. Explore data by patients' ID and feature family
+
+2. Recurrent Analysis
 
 ## Contact Us
 
