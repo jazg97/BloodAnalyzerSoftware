@@ -31,11 +31,11 @@ $ sudo apt install python3
 
 Make sure you have the following packages installed in your Python environment:
 
-- PyQt5 (https://pypi.org/project/PyQt5/)(https://anaconda.org/anaconda/pyqt)
-- matplotlib (https://pypi.org/project/matplotlib/) 
-- pandas (https://pypi.org/project/pandas/)
-- numpy  (https://pypi.org/project/numpy/)
-- Pillow (https://pypi.org/project/Pillow/) 
+- PyQt5 >= 5.9.0 (https://pypi.org/project/PyQt5/) (https://anaconda.org/anaconda/pyqt)
+- matplotlib >= 3.5.0 (https://pypi.org/project/matplotlib/) 
+- pandas >= 1.5.0 (https://pypi.org/project/pandas/)
+- numpy >= 1.23.0 (https://pypi.org/project/numpy/)
+- Pillow >= 9.2.0 (https://pypi.org/project/Pillow/) 
 - xml (https://docs.python.org/3/library/xml.etree.elementtree.html)
 
 ### Check with pip
