@@ -149,6 +149,8 @@ class InitialWindow(QtWidgets.QMainWindow):
         self.setFixedWidth(900)
         self.setFixedHeight(680)
 
+        self.setWindowTitle("B.A.S.")
+
     def choose_directory(self):
 
         directory = QtWidgets.QFileDialog.getExistingDirectory(self, "Select a folder", os.path.dirname(os.path.abspath(__file__)))
