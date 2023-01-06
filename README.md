@@ -24,18 +24,19 @@ Alternatively, you can install Python in your Linux-based machine with the follo
 ```bash
 #Step 1: Open up your terminal by pressing Ctrl + Alt + T.
 #Step 2: Update & Upgrade your local system's repository list by entering the following command
-sudo apt update & apt upgrade
+$ sudo apt update & apt upgrade
 #Step 3: Download the latest version of Python
-sudo apt install python3
+$ sudo apt install python3
 ```
 
-Make sure you have the following libraries installed in your Python environment:
+Make sure you have the following packages installed in your Python environment:
 
-- PyQt5
-- matplotlib 
-- pandas 
-- numpy 
-- xml 
+- PyQt5 (https://pypi.org/project/PyQt5/)(https://anaconda.org/anaconda/pyqt)
+- matplotlib (https://pypi.org/project/matplotlib/) 
+- pandas (https://pypi.org/project/pandas/)
+- numpy  (https://pypi.org/project/numpy/)
+- Pillow (https://pypi.org/project/Pillow/) 
+- xml (https://docs.python.org/3/library/xml.etree.elementtree.html)
 
 ### Check with pip
 
@@ -87,11 +88,7 @@ The project has the following structure:
     │   ├── multiple_ids_feature_ex2.png
     ├── features
     │   ├── cleaned_data.csv
-    │   ├── columns_to_drop.csv
     │   ├── test.csv
-    │   ├── test2.csv
-    │   ├── test3.csv
-    │   ├── test4.csv
                 
 ## Features
 
@@ -117,5 +114,5 @@ These are some common usage examples.
 
 ## License
 
-Blood Analyzer Software is released under the [MIT License](http://www.opensource.org/licenses/MIT) - Jose Zapana & Eric Schmitt - 2022.
+Blood Analyzer Software is released under the [MIT License](http://www.opensource.org/licenses/MIT) - Jose Zapana & Eric Schmitt - 2023.
 
