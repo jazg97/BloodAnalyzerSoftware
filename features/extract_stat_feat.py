@@ -91,10 +91,10 @@ x_pos = np.arange(1, 2*len(unique_dates), 2)
 
 for idy, feature in enumerate(features):
     axis = figure2.add_subplot(3,3,idy+1)#(2,int(np.ceil(len(features)/2)),idy+1)
-    [axis.bar(x_pos+i*wd, means[:,i,idy], yerr=stds[:,i,idy], width=wd, alpha=0.5, ecolor='black', capsize=6, label=uniques[i]) for i in range(means.shape[1])]
+    axis.boxplot([means[:,:,idy]], labels=uniques)
     axis.set_ylabel(feature)
     #axis.set_xlabel('Date')
-    axis.set_xticks(x_pos+wd, unique_dates)
+    #axis.set_xticks(x_pos+wd, unique_dates)
     #axis.legend()
 handles, labels = axis.get_legend_handles_labels()
 figure2.suptitle('WBC FAMILY & METADATA')

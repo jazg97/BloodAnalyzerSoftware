@@ -98,16 +98,21 @@ def clean_dataframe(dataframe):
     invalid_raw = [(column, np.unique(dataframe[column], return_counts=True)) for column in selected if 'raw' in column.lower()]
     invalid_occ = [column for (column, counts) in invalid_raw if '--.--' in counts[0]]
     invalid_rows = [np.where(dataframe[column] == '--.--') for column in invalid_occ]
-    indices = dataframe[dataframe[invalid_occ[0]] == '--.--'].index
-    dataframe.drop(indices, inplace=True)
-    
+    try:
+        indices = dataframe[dataframe[invalid_occ[0]] == '--.--'].index
+        dataframe.drop(indices, inplace=True)
+    except:
+        pass
     dataframe.loc[dataframe['FIELD_SID_OWNER_LASTNAME'].isnull(), 'FIELD_SID_OWNER_LASTNAME'] = 'GUEZGUEZ'
     dataframe.loc[dataframe['FIELD_SID_OWNER_LASTNAME'].str.isnumeric(), 'FIELD_SID_OWNER_LASTNAME'] = 'GUEZGUEZ'
     dataframe.loc[(dataframe['FIELD_SID_OWNER_LASTNAME'] !='SCHUPPAN') & (dataframe['FIELD_SID_OWNER_LASTNAME'] !='GUEZGUEZ'), 'FIELD_SID_ANIMAL_NAME'] =  dataframe.loc[(dataframe['FIELD_SID_OWNER_LASTNAME'] !='SCHUPPAN') & (dataframe['FIELD_SID_OWNER_LASTNAME'] !='GUEZGUEZ'), 'FIELD_SID_OWNER_LASTNAME']
     dataframe.loc[(dataframe['FIELD_SID_OWNER_LASTNAME'] !='SCHUPPAN') & (dataframe['FIELD_SID_OWNER_LASTNAME'] !='GUEZGUEZ'), 'FIELD_SID_OWNER_LASTNAME'] = 'GUEZGUEZ'
     dataframe.loc[dataframe['FIELD_SID_ANIMAL_NAME'].isnull(), 'FIELD_SID_ANIMAL_NAME'] = 'BLOOD'
     dataframe.loc[(dataframe['FIELD_SID_ANIMAL_NAME'] == 'SPL') | (dataframe['FIELD_SID_ANIMAL_NAME'] == 'SP') , 'FIELD_SID_ANIMAL_NAME'] = 'SPLEEN'
-    
+    try:
+        dataframe.loc[dataframe['FIELD_SID_PATIENT_ID'].str.contains('|'.join(['SPL','SP']), case=True), 'FIELD_SID_ANIMAL_NAME'] = 'SPLEEN'
+    except:
+        pass
     df = dataframe.copy()
     for col in df:
         unique = df[col].unique()

@@ -3,7 +3,7 @@ import numpy as np
 
 root_dir = '\\'.join(os.path.dirname(os.path.realpath(__file__)).split('\\')[:-1])
 
-file = os.path.join(root_dir, 'tests', 'test4.csv')
+file = os.path.join(root_dir, 'tests', 'new_test.csv')
 
 dataframe = pd.read_csv(file)
 
@@ -32,10 +32,11 @@ print(invalid_rows)
 
 #Its always the same files, so I'll just grab the first column
 
-indices = dataframe[dataframe[invalid_occ[0]] == '--.--'].index
-
-dataframe.drop(indices, inplace=True)
-
+try:
+    indices = dataframe[dataframe[invalid_occ[0]] == '--.--'].index
+    dataframe.drop(indices, inplace=True)
+except:
+    pass
 #Dropping rows without a patient id
 
 unique_id = np.unique(dataframe['FIELD_SID_PATIENT_ID'].values, return_counts=True)
@@ -60,8 +61,10 @@ dataframe.loc[dataframe['FIELD_SID_ANIMAL_NAME'].isnull(), 'FIELD_SID_ANIMAL_NAM
 
 dataframe.loc[(dataframe['FIELD_SID_ANIMAL_NAME'] == 'SPL') | (dataframe['FIELD_SID_ANIMAL_NAME'] == 'SP') , 'FIELD_SID_ANIMAL_NAME'] = 'SPLEEN'
 
-dataframe.loc[dataframe['FIELD_SID_PATIENT_ID'].str.contains('|'.join(['SPL','SP']), case=True), 'FIELD_SID_ANIMAL_NAME'] = 'SPLEEN'
-
+try:
+    dataframe.loc[dataframe['FIELD_SID_PATIENT_ID'].str.contains('|'.join(['SPL','SP']), case=True), 'FIELD_SID_ANIMAL_NAME'] = 'SPLEEN'
+except:
+    pass
 #dateframe.loc[dataframe['FIELD_SID_PATIENT_ID'].str.contains('|'.join(['SPL','SP']), case=True), 'FIELD_SID_PATIENT_ID'] = 'SPLEEN'
 
 df = dataframe.copy()
@@ -91,5 +94,5 @@ df['FIELD_SID_PATIENT_LAST_NAME'] = ''
 
 print('Number of removed columns:', len(set(list(og)) - set(list(df))))
 
-out_file = os.path.join(root_dir, 'tests', 'cleaned_data3.csv')
+out_file = os.path.join(root_dir, 'tests', 'cleaned_data4.csv')
 df.to_csv(out_file, index=False)

@@ -525,21 +525,21 @@ class SecondWindow(QtWidgets.QMainWindow):
             print('Time-based')
             unique_dates = selected_df['ANALYSIS_DATE'].apply(lambda x: x.split(' ')[0]).unique()
 
-            means = []
+            medians = []
             stds  = []#lol
             for idx, date in enumerate(unique_dates):
                 selected_perdate = selected_df[selected_df['ANALYSIS_DATE'].str.contains(date)]
                 groupings = [np.where(selected_perdate[column].values == unique) for unique in uniques]
-                mean_perdate = []
+                median_perdate = []
                 std_perdate = []
                 for idy, group in enumerate(groupings):
-                    mean_pergroup = np.mean(selected_perdate[features].values[group], axis=0)
+                    median_pergroup = np.median(selected_perdate[features].values[group], axis=0)
                     std_pergroup =  np.std(selected_perdate[features].values[group], axis=0)
-                    mean_perdate.append(mean_pergroup)
+                    median_perdate.append(median_pergroup)
                     std_perdate.append(std_pergroup)
-                means.append(np.vstack(mean_perdate))
+                medians.append(np.vstack(median_perdate))
                 stds.append(np.vstack(std_perdate))
-            means = np.array(means)
+            medians = np.array(medians)
             stds = np.array(stds)
 
             x_pos = np.arange(1,2*len(unique_dates), 2)
@@ -549,7 +549,7 @@ class SecondWindow(QtWidgets.QMainWindow):
                     axis = self.canvas.fig.add_subplot(3,3,idx+1)
                 else:
                     axis = self.canvas.fig.add_subplot(2,int(np.ceil(len(features)/2)),idx+1)
-                [axis.bar(x_pos+i*wd, means[:,i,idx], yerr=stds[:,i,idx], width=wd, alpha=0.5, ecolor='black', capsize=6, label=uniques[i]) for i in range(means.shape[1])]
+                [axis.bar(x_pos+i*wd, medians[:,i,idx], yerr=stds[:,i,idx], width=wd, alpha=0.5, ecolor='black', capsize=6, label=uniques[i]) for i in range(medians.shape[1])]
                 axis.set_ylabel(feature)
                 axis.set_xticks(x_pos+wd, unique_dates)
             self.canvas.fig.autofmt_xdate()#Comment if plotting fails
