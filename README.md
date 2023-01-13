@@ -59,8 +59,8 @@ Open _Terminal_ or your _IDE_ of preference within your 'projects' folder and ta
 
 ```bash
 #Step 1: Get sources from GitHub
-$ git clone https://github.com/jazg97/Leukaemia_BloodAnalyzer.git
-$ cd Leukaemia_BloodAnalyzer
+$ git clone https://github.com/jazg97/BloodAnalyzerSoftware.git
+$ cd BloodAnalyzerSoftware
 $ python3 feature_code.py
 ```
 
@@ -103,10 +103,6 @@ The Blood Analyzer Software (B.A.S.) is an data visualization and explorative to
 5. Extract statistical features
 6. Export selected data
 
-```py
-
-```
-
 ## Examples
 
 These are some common usage examples.
@@ -114,9 +110,23 @@ These are some common usage examples.
 1. New Analysis
 
 1.1. Start new analysis
+
+1.1.1. Generate new csv file without GUI
+```py
+$ cd BloodAnalyzerSoftware
+$ python3 features/parsing_multiple_files.py file_dir output_name.csv
+$ python3 features/cleaning_csv.py raw_frame.csv clean_data.csv
+```
+1.1.2. Generate new csv file with GUI
+```py
+$ cd BloodAnalyzerSoftware
+$ python3 features/GUI.py
+$ #Then select the option of Start New Analysis
+```
 1.2. Explore data by patients' ID and feature family
 
 2. Recurrent Analysis
+
 
 ## Contact Us
 
