@@ -395,6 +395,7 @@ class SecondWindow(QtWidgets.QMainWindow):
             axis.legend()
             #plt.subplots_adjust(left=0, bottom=0.1, right=0, top=0.2)
         #self.canvas.fig.tight_layout()
+        self.canvas.fig.autofmt_xdate()
         self.canvas.fig.suptitle(t = family[0] + " Time-series", fontsize = 24, y=0.95)
         self.canvas.draw()
 
