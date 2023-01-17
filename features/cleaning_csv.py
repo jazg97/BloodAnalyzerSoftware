@@ -1,11 +1,15 @@
 from utils import *
 import numpy as np
 
+input_file = sys.argv[-2]
+
+output_file = sys.argv[-1]
+
 root_dir = '\\'.join(os.path.dirname(os.path.realpath(__file__)).split('\\')[:-1])
 
-file = os.path.join(root_dir, 'tests', 'new_test.csv')
+#file = os.path.join(root_dir, 'tests', 'new_test.csv')
 
-dataframe = pd.read_csv(file)
+dataframe = pd.read_csv(input_file)
 
 og = dataframe.copy()
 
@@ -94,5 +98,5 @@ df['FIELD_SID_PATIENT_LAST_NAME'] = ''
 
 print('Number of removed columns:', len(set(list(og)) - set(list(df))))
 
-out_file = os.path.join(root_dir, 'tests', 'cleaned_data4.csv')
-df.to_csv(out_file, index=False)
+#out_file = os.path.join(root_dir, 'tests', 'cleaned_data4.csv')
+df.to_csv(os.path.join(root_dir, 'tests', output_file), index=False)

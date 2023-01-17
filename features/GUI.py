@@ -240,7 +240,7 @@ class SecondWindow(QtWidgets.QMainWindow):
         self.test_box = CheckableComboBox()
         self.test_box.model().setItem(0,0,self.family_label)
         self.test_box.lineEdit().setText("----- Select Blood Test(s) -----")
-        for i, value in enumerate(['BLOOD', 'SPLEEN', 'BM']):
+        for i, value in enumerate(np.unique(self.dataframe['FIELD_SID_ANIMAL_NAME'].values)):
             self.test_box.addItem('%s' % value)
             item = self.test_box.model().item(i+1,0)
             item.setCheckState(QtCore.Qt.Unchecked)
@@ -362,18 +362,18 @@ class SecondWindow(QtWidgets.QMainWindow):
             datepoints = []
             for patient in patient_ids:
                 patient = patient.split(' ')[-1]
-                #print(patient)
+                print(patient)
                 if selected_dates:
                     patient_df = self.dataframe[(self.dataframe['FIELD_SID_PATIENT_ID']==patient) & (self.dataframe['FIELD_SID_ANIMAL_NAME'].isin(tests)) & (self.dataframe['ANALYSIS_DATE'].str.contains('|'.join(selected_dates), case=True))]
                     #self.dataframe['ANALYSIS_DATE'].isin(selected_dates)
                     #print(patient_df)
                 else:
-                    patient_df = self.dataframe[(self.dataframe['FIELD_SID_PATIENT_ID']==patient) & (self.dataframe['FIELD_SID_ANIMAL_NAME'].isin(tests))]
+                    patient_df = self.dataframe[(self.dataframe['FIELD_SID_PATIENT_ID']==str(patient)) & (self.dataframe['FIELD_SID_ANIMAL_NAME'].isin(tests))]
                 datapoints = patient_df[raw_feature]
-                #print(datapoints.values)
+                print(datapoints.values)
                 dates = self.dataframe['ANALYSIS_DATE'][datapoints.index]
                 dates = [date.split(' ')[0] for date in dates.values]
-                #print(dates)
+                print(dates)
                 axis.plot(dates, datapoints, label=patient, ls=':', linewidth=2.5)
                 limits = [self.dataframe[feature+'_'+limit][datapoints.index].values[0] for limit in ['LowLimit', 'HighLimit']]
                 data.append(datapoints)
