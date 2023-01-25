@@ -114,9 +114,9 @@ These are some common usage examples.
 1.1.1. Generate new csv file without GUI
 ```py
 $ cd BloodAnalyzerSoftware
-$ python3 features/parsing_multiple_files.py file_dir output_name.csv
-$ python3 features/cleaning_csv.py raw_frame.csv clean_data.csv
+$ python3 features/generate_csv.py files_dir output_dir/output_name.csv
 ```
+
 1.1.2. Generate new csv file with GUI
 ```py
 $ cd BloodAnalyzerSoftware
