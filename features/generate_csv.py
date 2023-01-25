@@ -10,6 +10,6 @@ raw_df = parse_multiple_files(directory)
 
 clean_df = clean_dataframe(raw_df)
 
-out_file = os.path.join('\\'.join(root_dir.split('\\')[:-1]), 'tests', output_name)
+#out_file = os.path.join('\\'.join(root_dir.split('\\')[:-1]), 'tests', output_name)
 
-clean_df.to_csv(out_file)
+clean_df.to_csv(output_name)
