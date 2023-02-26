@@ -92,7 +92,7 @@ The project has the following structure:
                 
 ## Features
 
-The Blood Analyzer Software (B.A.S.) is an data visualization and explorative tool, consequently most of its features are related to these tasks.
+The Blood Analyzer Software (B.A.S.) is a data visualization and explorative tool, consequently most of its features are related to these tasks.
 
 1. Generate new csv file
 2. Plot time-series by feature family and patients' ID
