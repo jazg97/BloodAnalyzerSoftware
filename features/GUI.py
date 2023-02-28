@@ -284,7 +284,7 @@ class SecondWindow(QtWidgets.QMainWindow):
         self.time_radio.setChecked(False)
 
         self.stat_button = QtWidgets.QPushButton('Generate Box-Plot')
-        
+
         self.warning_box = QtWidgets.QMessageBox()
         self.warning_box.setIcon(QtWidgets.QMessageBox.Warning)
         self.warning_box.setWindowTitle('Warning')
@@ -361,6 +361,7 @@ class SecondWindow(QtWidgets.QMainWindow):
         features = family_dict[family[0]]
 
         warning_list = []
+        unique_dates = []
 
         print(features)
 
@@ -400,20 +401,21 @@ class SecondWindow(QtWidgets.QMainWindow):
                     datepoints.append(dates)
                 except:
                     warning_list.append(patient)
+                    limits = []
+            
             try:
                 unique_dates = np.unique(np.hstack(datepoints).flatten())
                 min_value = np.min(np.hstack(data).flatten())
                 max_value = np.max(np.hstack(data).flatten())
                 axis.set_ylim(min_value-1, max_value+2)
+                axis.axhline(y = limits[0], label='LowLimit', ls='-.', c='r')
+                axis.axhline(y = limits[1], label='HighLimit', ls='-.', c='y')
             except:
                 pass
 
-            axis.axhline(y = limits[0], label='LowLimit', ls='-.', c='r')
-            axis.axhline(y = limits[1], label='HighLimit', ls='-.', c='y')
-
             axis.set_xlabel('Date')
             axis.set_ylabel(feature)
-            
+
             axis.legend()
 
         warning_list = np.unique(warning_list).tolist()
@@ -421,7 +423,7 @@ class SecondWindow(QtWidgets.QMainWindow):
         self.canvas.fig.autofmt_xdate()
         self.canvas.fig.suptitle(t = family[0] + " Time-series", fontsize = 24, y=0.95)
         self.canvas.draw()
-
+        
         self.update_datebox(unique_dates)
         self.showMaximized()
 
