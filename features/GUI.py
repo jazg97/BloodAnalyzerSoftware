@@ -4,8 +4,7 @@ import sys
 import matplotlib
 from PIL import Image, ImageQt
 from matplotlib.backends.backend_qtagg import (
-    FigureCanvasQTAgg, NavigationToolbar2QT as NavigationToolbar
-)
+    FigureCanvasQTAgg, NavigationToolbar2QT as NavigationToolbar)
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import numpy as np
@@ -285,6 +284,11 @@ class SecondWindow(QtWidgets.QMainWindow):
         self.time_radio.setChecked(False)
 
         self.stat_button = QtWidgets.QPushButton('Generate Box-Plot')
+        
+        self.warning_box = QtWidgets.QMessageBox()
+        self.warning_box.setIcon(QtWidgets.QMessageBox.Warning)
+        self.warning_box.setWindowTitle('Warning')
+        self.warning_box.addButton(QtWidgets.QMessageBox.Ok)
 
         self.contained_box = QtWidgets.QHBoxLayout()
         self.contained_box.addWidget(self.global_radio)
@@ -356,6 +360,8 @@ class SecondWindow(QtWidgets.QMainWindow):
 
         features = family_dict[family[0]]
 
+        warning_list = []
+
         print(features)
 
         for idx,feature in enumerate(features):
@@ -387,50 +393,66 @@ class SecondWindow(QtWidgets.QMainWindow):
                 dates = [date.split(' ')[0] for date in dates.values]
                 print(dates)
                 axis.plot(dates, datapoints, label=patient, ls=':', linewidth=2.5)
-                limits = [self.dataframe[feature+'_'+limit][datapoints.index].values[0]
-                          for limit in ['LowLimit', 'HighLimit']]
-                data.append(datapoints)
-                datepoints.append(dates)
-
-            min_value = np.min(np.hstack(data).flatten())
-            max_value = np.max(np.hstack(data).flatten())
-
-            unique_dates = np.unique(np.hstack(datepoints).flatten())
+                try:
+                    limits = [self.dataframe[feature+'_'+limit][datapoints.index].values[0]
+                              for limit in ['LowLimit', 'HighLimit']]
+                    data.append(datapoints)
+                    datepoints.append(dates)
+                except:
+                    warning_list.append(patient)
+            try:
+                unique_dates = np.unique(np.hstack(datepoints).flatten())
+                min_value = np.min(np.hstack(data).flatten())
+                max_value = np.max(np.hstack(data).flatten())
+                axis.set_ylim(min_value-1, max_value+2)
+            except:
+                pass
 
             axis.axhline(y = limits[0], label='LowLimit', ls='-.', c='r')
             axis.axhline(y = limits[1], label='HighLimit', ls='-.', c='y')
 
             axis.set_xlabel('Date')
             axis.set_ylabel(feature)
-            #axis.title.set_text(raw_feature +' Timeseries')
-            axis.set_ylim(min_value-1, max_value+2)
-            #axis.margins(0)
+            
             axis.legend()
-            #plt.subplots_adjust(left=0, bottom=0.1, right=0, top=0.2)
-        #self.canvas.fig.tight_layout()
+
+        warning_list = np.unique(warning_list).tolist()
+        self.show_warning_message(warning_list, tests)
         self.canvas.fig.autofmt_xdate()
         self.canvas.fig.suptitle(t = family[0] + " Time-series", fontsize = 24, y=0.95)
         self.canvas.draw()
 
-        #self.date_box.selected_items.clear()
+        self.update_datebox(unique_dates)
+        self.showMaximized()
+
+    def show_warning_message(self, warning_list, tests):
+
+        if len(warning_list)==1:
+            self.warning_box.setText('Patient ID #'+str(warning_list[0])+" has no "+tests[0]+" samples." +'\n' + 'Try with another patient ID.')
+            self.warning_box.exec_()
+        elif len(warning_list)>1:
+            self.warning_box.setText('Patient IDs #'+str(','.join(warning_list))+" has no "+tests[0]+" samples." +'\n' + 'Try with another patient ID.')
+            self.warning_box.exec_()
+
+
+    def update_datebox(self, new_dates):
+        new_dates = sorted(new_dates, key = lambda x: datetime.strptime(x, '%d-%m-%y'))
         count = self.date_box.count()
-        print(count)
+        print('Old date count:', count)
         if count == 1:
-            for i in range(len(unique_dates)):
-                self.date_box.addItem('%s'% unique_dates[i])
+            for i in range(len(new_dates)):
+                self.date_box.addItem('%s'% new_dates[i])
                 item = self.date_box.model().item(i+1,0)
                 item.setCheckState(QtCore.Qt.Unchecked)
         else:
-            for i in range(len(unique_dates)):
+            for i in range(len(new_dates)):
                 if i <count-1:
-                    self.date_box.setItemText(i+1, unique_dates[i])
+                    self.date_box.setItemText(i+1, new_dates[i])
                 else:
-                    self.date_box.addItem('%s'% unique_dates[i])
+                    self.date_box.addItem('%s'% new_dates[i])
                 item = self.date_box.model().item(i+1,0)
                 item.setCheckState(QtCore.Qt.Unchecked)
-        #self.setFixedWidth(1500)
-        #self.setFixedHeight(1200)
-        self.showMaximized()
+        print('New date count:', self.date_box.count())
 
     def show_dataframe(self):
         patient_ids = [patient.split(' ')[-1] for patient in self.id_box.selected_items]
