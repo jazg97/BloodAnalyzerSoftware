@@ -393,7 +393,7 @@ class SecondWindow(QtWidgets.QMainWindow):
                 dates = self.dataframe['ANALYSIS_DATE'][datapoints.index]
                 dates = [date.split(' ')[0] for date in dates.values]
                 print(dates)
-                axis.plot(dates, datapoints, label=patient, ls=':', linewidth=2.5)
+                axis.plot(dates, datapoints, label=patient, ls=':', marker = 'o', linewidth=2.5)
                 try:
                     limits = [self.dataframe[feature+'_'+limit][datapoints.index].values[0]
                               for limit in ['LowLimit', 'HighLimit']]
@@ -433,7 +433,7 @@ class SecondWindow(QtWidgets.QMainWindow):
             self.warning_box.setText('Patient ID #'+str(warning_list[0])+" has no "+tests[0]+" samples." +'\n' + 'Try with another patient ID.')
             self.warning_box.exec_()
         elif len(warning_list)>1:
-            self.warning_box.setText('Patient IDs #'+str(','.join(warning_list))+" has no "+tests[0]+" samples." +'\n' + 'Try with another patient ID.')
+            self.warning_box.setText('Patient IDs #'+str(','.join(warning_list))+" have no "+tests[0]+" samples." +'\n' + 'Try with another patient ID.')
             self.warning_box.exec_()
 
 
