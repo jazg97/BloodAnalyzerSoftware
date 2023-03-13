@@ -89,7 +89,7 @@ def parse_multiple_files(directory, progress_bar=None):
 def clean_dataframe(dataframe):
     copy = dataframe.copy()
     
-    undesired_columns = ['ExpiredReagent', 'OPERATOR', 'PACKET_TYPE', 'QCFailed', 'SAMPLING_MODE', 'Archived', 'EOS#_EOS', 'ANALYSIS_TYPE', 'ANALYZER_NO', 'FIELD_SID_PATIENT_SEX', 'FIELD_SID_SAMPLE_TYPE', 'FIELD_SID_SESSIONID', 'VET_VERSION', 'XBDrift', 'CONCENTRATED_PLATELET']
+    undesired_columns = ['ExpiredReagent', 'OPERATOR', 'PACKET_TYPE', 'QCFailed', 'SAMPLING_MODE', 'Archived', 'EOS#_EOS', 'ANALYSIS_TYPE', 'ANALYZER_NO', 'FIELD_SID_PATIENT_SEX', 'FIELD_SID_SAMPLE_TYPE', 'FIELD_SID_SESSIONID', 'VET_VERSION', 'XBDrift']
     dataframe = dataframe.drop('InvalidAlarmStartup', axis=1)
     dataframe = dataframe.drop('InvalidQC', axis=1)
     columns = dataframe.columns
