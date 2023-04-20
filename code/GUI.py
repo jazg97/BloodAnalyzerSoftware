@@ -420,42 +420,46 @@ class SecondWindow(QtWidgets.QMainWindow):
         first_column.addStretch()
         first_column.addWidget(self.column_label)
         #first_column.addWidget(self.explanation_label)
-        first_column.addWidget(self.first_label)
-        first_column.addWidget(self.id_box)
-        first_column.addWidget(self.second_label)
-        first_column.addWidget(self.test_groupbox)
-        first_column.addWidget(self.third_label)
-        first_column.addWidget(self.feature_groupbox)
-        first_column.addWidget(self.fourth_label)
-        first_column.addWidget(self.date_box)
-        first_column.addWidget(self.meta_label)
-        first_column.addWidget(self.imported_box)
-        first_column.addWidget(self.meta_groupbox)
+        first_column.addWidget(self.first_label, stretch = 2)
+        first_column.addWidget(self.id_box, stretch = 1)
+        first_column.addWidget(self.second_label, stretch = 2)
+        first_column.addWidget(self.test_groupbox, stretch = 1)
+        first_column.addWidget(self.third_label, stretch = 2)
+        first_column.addWidget(self.feature_groupbox, stretch = 1)
+        first_column.addWidget(self.fourth_label, stretch = 2)
+        first_column.addWidget(self.date_box, stretch = 1)
+        first_column.addWidget(self.meta_label, stretch = 2)
+        first_column.addWidget(self.imported_box, stretch = 1)
+        first_column.addWidget(self.meta_groupbox, stretch = 1)
         first_column.addStretch()
         first_column.addWidget(self.plot_button)
         first_column.addWidget(self.stat_button)
         second_column.addWidget(self.toolbar)
         second_column.addWidget(self.canvas)
 
-        self.date_box.setVisible(False)
+        self.date_box.setEnabled(False)
+        self.date_box.setVisible(True)
         root_layout.addLayout(first_column)
-        root_layout.addStretch()
+        #root_layout.addStretch()
         root_layout.addLayout(second_column)
         self.toolbar.setVisible(False)
-        self.imported_box.setVisible(False)
+        self.imported_box.setEnabled(False)
         self.canvas.setVisible(False)
-        self.global_radio.setVisible(False)
-        self.time_radio.setVisible(False)
-        self.meta_groupbox.setVisible(False)
-        self.stat_button.setVisible(False)
-        self.fourth_label.setVisible(False)
-        self.meta_label.setVisible(False)
+        self.global_radio.setEnabled(False)
+        self.time_radio.setEnabled(False)
+        self.meta_groupbox.setEnabled(False)
+        self.stat_button.setEnabled(False)
+        self.fourth_label.setEnabled(False)
+        self.meta_label.setEnabled(False)
+        self.meta_groupbox.setEnabled(False)
 
         self.plot_button.clicked.connect(self.gen_plot)
         self.stat_button.clicked.connect(self.generate_boxplot)
 
         self.setWindowIcon(QtGui.QIcon(os.path.join(location, 'BloodAnalyzerIcon.png')))
         self.setWindowTitle("B.A.S.")
+        
+        print(self.size())
         
     def initiate_idBox(self, unique_ids):
         self.id_box.model().setItem(0,0,self.selected_label)
@@ -501,8 +505,8 @@ class SecondWindow(QtWidgets.QMainWindow):
 
         self.toolbar.setVisible(True)
         self.canvas.setVisible(True)
-        self.date_box.setVisible(True)
-        self.fourth_label.setVisible(True)
+        self.date_box.setEnabled(True)
+        self.fourth_label.setEnabled(True)
         self.canvas.fig.clf()
         self.canvas.axs = []
         axis = None
@@ -577,7 +581,10 @@ class SecondWindow(QtWidgets.QMainWindow):
         self.canvas.draw()
         
         self.update_datebox(raw_dates, unique_dates)
-        self.showMaximized()
+        #print(self.canvas.size())
+        #print(self.size())        
+        self.resize(1620, 980)
+        #self.showMaximized()
 
     def show_warning_message(self, warning_list, selected_test):
 
@@ -703,12 +710,12 @@ class SecondWindow(QtWidgets.QMainWindow):
                 self.imported_box.addItem('%s'% col)
                 item = self.imported_box.model().item(i+1,0)
                 item.setCheckState(QtCore.Qt.Unchecked)
-            self.imported_box.setVisible(True)
-            self.global_radio.setVisible(True)
-            self.time_radio.setVisible(True)
-            self.stat_button.setVisible(True)
-            self.meta_label.setVisible(True)
-            self.meta_groupbox.setVisible(True)
+            self.imported_box.setEnabled(True)
+            self.global_radio.setEnabled(True)
+            self.time_radio.setEnabled(True)
+            self.stat_button.setEnabled(True)
+            self.meta_label.setEnabled(True)
+            self.meta_groupbox.setEnabled(True)
 
     def generate_boxplot(self):
 
@@ -716,15 +723,18 @@ class SecondWindow(QtWidgets.QMainWindow):
         self.canvas.setVisible(True)
         #self.df_button.setVisible(True)
         #self.export_button.setVisible(True)
+        
+        selected_feature = self.get_checkedItem(self.feature_buttonGroup)
+        selected_test = self.get_checkedItem(self.test_buttonGroup)
 
-        family = self.feature_box.selected_items
-        tests = self.test_box.selected_items
+        #family = self.feature_box.selected_items
+        #tests = self.test_box.selected_items
 
         meta_patients = [str(animal_id) for animal_id in self.metadata['animal_id'].values]
         #print(meta_patients)(self.dataframe['FIELD_SID_PATIENT_ID'].str.contains('|'.join(meta_patients), case=True))
 
         selected_df = self.dataframe[(self.dataframe['FIELD_SID_PATIENT_ID'].str.contains('|'.join(meta_patients), case=True))&
-                                     (self.dataframe['FIELD_SID_ANIMAL_NAME'].isin(tests))]
+                                     (self.dataframe['FIELD_SID_ANIMAL_NAME'].isin([selected_test]))]
 
         #print(selected_df)
 
@@ -749,13 +759,13 @@ class SecondWindow(QtWidgets.QMainWindow):
         axis = None
 
         #print('A')
-        features = family_dict[family[0]]
+        features = family_dict[selected_feature] #self.get_checkedItem(self.feature_buttonGroup)
         features = [feature+'_Value' for feature in features]
         if self.global_radio.isChecked():
             print('Global')
             x_pos = 0.5
             for idx, feature in enumerate(features):
-                if family[0] =='WBC FAMILY':
+                if selected_feature =='WBC FAMILY':
                     axis = self.canvas.fig.add_subplot(3,3,idx+1)
                 else:
                     axis = self.canvas.fig.add_subplot(2,int(np.ceil(len(features)/2)),idx+1)
@@ -792,7 +802,7 @@ class SecondWindow(QtWidgets.QMainWindow):
             x_pos = np.arange(1,2*len(unique_dates), 2)
 
             for idx, feature in enumerate(features):
-                if family[0] =='WBC FAMILY':
+                if selected_feature =='WBC FAMILY':
                     axis = self.canvas.fig.add_subplot(3,3,idx+1)
                 else:
                     axis = self.canvas.fig.add_subplot(2,int(np.ceil(len(features)/2)),idx+1)
