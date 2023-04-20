@@ -32,12 +32,12 @@ def recursive_parsing(node, identifier='o', attrib_list=[], val_list=[], idef=''
 
     return attrib_list, val_list
 
-def parse_multiple_files(directory, progress_bar=None):
+def parse_multiple_files(filenames, progress_bar=None):
     dict_list = []
-    for idx, file in enumerate(os.listdir(directory)):
+    for idx, file in enumerate(filenames):
         if progress_bar is not None:
             progress_bar.setValue(idx+1)
-        tree = et.parse(os.path.join(directory, file))
+        tree = et.parse(file)
         root = tree.getroot()
         attrib_list = []
         val_list = []

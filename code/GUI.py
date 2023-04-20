@@ -53,6 +53,7 @@ class TableWindow(QtWidgets.QMainWindow):
         self.setCentralWidget(self.widget)
 
         self.setWindowTitle("Dataframe")
+        self.resize(480,480)
         self.show()
 
 
@@ -175,7 +176,7 @@ class InitialWindow(QtWidgets.QMainWindow):
 
         self.progress_bar.setMinimum(0)
         self.progress_bar.setMaximum(len(os.listdir(directory)))
-        raw_df = parse_multiple_files(directory, self.progress_bar)
+        raw_df = parse_multiple_files([os.path.join(directory, file) for file in os.listdir(directory)], self.progress_bar)
         clean_df = clean_dataframe(raw_df)
         
         filename, _ = QtWidgets.QFileDialog.getSaveFileName(self, 'Save as', os.path.dirname(os.path.abspath(__file__)), "Comma-separated values (*.csv)")
@@ -203,7 +204,7 @@ class InitialWindow(QtWidgets.QMainWindow):
                                                         "Comma-separated values (*.csv)")
         if file !='':
             self.selected_file = file
-            self.signal.emit('Closed')
+            self.signal.emit('Open SecondWindow')
             self.close()
 
 class WelcomeDialog(QtWidgets.QDialog):
@@ -227,13 +228,14 @@ class WelcomeDialog(QtWidgets.QDialog):
         # Add instructions to the layout
         instructions_label = QtWidgets.QLabel(self)
         instructions_label.setText('Here are some brief instructions to get you started:\n\n1.'+
-                                   'Select the patients IDs.\n2. Select the type of blood test.\n3.'+
-                                   'Select the features family.\n4. Generate the desired plot')
+                                   'Select patients IDs of interest.\n2. Select a blood test.\n3.'+
+                                   'Select the features family of interest.\n4. Filter the timeseries by the patient ID and dates.\n5.' 
+                                   'Additionally, you can import metadata and generate a boxplot according to the desired values.')
         instructions_label.setAlignment(QtCore.Qt.AlignCenter)   
         #'<a href="https://github.com/your_username/your_repository">Click here to visit the GitHub repository</a>'
         #Add link to the Github repo
         link_label = QtWidgets.QLabel()
-        link_label.setText('For more information, please visit our '+
+        link_label.setText('For more information and detailed usage examples, please visit our '+
                                '<a href="https://github.com/jazg97/BloodAnalyzerSoftware">GitHub repository</a>.')
         link_label.setAlignment(QtCore.Qt.AlignCenter)
         link_label.setOpenExternalLinks(True)
@@ -249,9 +251,107 @@ class WelcomeDialog(QtWidgets.QDialog):
         
         self.setLayout(message_layout)        
 
-#Class wrapper for Dialog test window
+class ListSelectionWindow(QtWidgets.QDialog):
+    def __init__(self, parent=None, patients_dict=None, *args, **kwargs):
+        super(ListSelectionWindow, self).__init__(parent)
+
+        self.setWindowTitle("Filter Series by Dates")
+        self.setGeometry(100, 100, 850, 300)
+
+        self.list_selection_button = QtWidgets.QPushButton("Update Plot")
+        self.list_selection_button.setFixedSize(200, 60)
+        self.list_selection_button.clicked.connect(self.close)
+        #self.list_selection_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        
+        self.patients = patients_dict
+        
+        self.removed_dates = {key: [] for key in self.patients.keys()}
+
+        # create list widgets
+        self.available_list_widget = QtWidgets.QListWidget()
+        self.available_list_widget.addItems(list(self.patients.keys()))
+        self.available_list_widget.itemClicked.connect(self.update_date_list)
+
+        self.second_list_widget = QtWidgets.QListWidget()
+        self.second_selected_list_widget = QtWidgets.QListWidget()        
+
+        # create button to move items from available list to selected list
+        self.add_button2 = QtWidgets.QPushButton(">>")
+        self.add_button2.setToolTip('Remove a Date')
+        self.add_button2.clicked.connect(self.select_second_item)
+
+        # create button to move items from selected list to available list
+        self.remove_button2 = QtWidgets.QPushButton("<<")
+        self.remove_button2.setToolTip('Reinsert a Date')
+        self.remove_button2.clicked.connect(self.reset_second_item)
+
+        self.button_layout2 = QtWidgets.QVBoxLayout()
+        self.button_layout2.addWidget(self.add_button2)
+        self.button_layout2.addWidget(self.remove_button2)
+
+        self.current_box = QtWidgets.QVBoxLayout()
+        self.current_label = QtWidgets.QLabel("Selected IDs")
+        self.current_box.addWidget(self.current_label)
+        self.current_box.addWidget(self.available_list_widget)
+        
+        self.second_current_box = QtWidgets.QVBoxLayout()
+        self.second_current_label = QtWidgets.QLabel("Selected Sample Dates")
+        self.second_current_box.addWidget(self.second_current_label)
+        self.second_current_box.addWidget(self.second_list_widget)
+        
+        self.second_removed_box = QtWidgets.QVBoxLayout()
+        self.second_removed_label = QtWidgets.QLabel("Removed Sample Dates")
+        self.second_removed_box.addWidget(self.second_removed_label)
+        self.second_removed_box.addWidget(self.second_selected_list_widget)
+
+        # create layout for lists
+        self.list_layout = QtWidgets.QHBoxLayout()
+        self.list_layout.addLayout(self.current_box, stretch = 2)
+        self.list_layout.addLayout(self.second_current_box, stretch = 2)
+        self.list_layout.addLayout(self.button_layout2, stretch = 1)
+        self.list_layout.addLayout(self.second_removed_box, stretch = 2)
+
+        # create main layout for window
+        self.main_layout = QtWidgets.QVBoxLayout()
+        self.main_layout.addLayout(self.list_layout, stretch = 1)
+        self.main_layout.addWidget(self.list_selection_button, stretch = 1)
+
+        self.main_layout.setAlignment(self.list_selection_button, QtCore.Qt.AlignHCenter)
+
+        self.setLayout(self.main_layout)
+    
+    def update_date_list(self, id_item):
+        
+        self.second_list_widget.clear()
+        self.second_selected_list_widget.clear()
+        dates = self.patients[id_item.text()]
+        removed = self.removed_dates[id_item.text()]
+        self.second_list_widget.addItems(dates)
+        self.second_selected_list_widget.addItems(removed)
+        
+    def select_second_item(self):
+        item = self.second_list_widget.currentItem()
+        id_item   = self.available_list_widget.currentItem()
+        if item is None:
+            return
+        self.second_list_widget.takeItem(self.second_list_widget.row(item))
+        self.second_selected_list_widget.addItem(item.text())
+        self.removed_dates[id_item.text()].append(item.text())
+        self.patients[id_item.text()].remove(item.text())
+
+    def reset_second_item(self):
+        item = self.second_selected_list_widget.currentItem()
+        id_item = self.available_list_widget.currentItem()
+        if item is None:
+            return
+        self.second_selected_list_widget.takeItem(self.second_selected_list_widget.row(item))
+        self.second_list_widget.addItem(item.text())
+        self.removed_dates[id_item.text()].remove(item.text())
+        self.patients[id_item.text()].append(item.text())
+
 #Class wrapper for Dialog test window
 class SecondWindow(QtWidgets.QMainWindow):
+    signal = QtCore.pyqtSignal(str)
     def __init__(self, filename, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -259,6 +359,7 @@ class SecondWindow(QtWidgets.QMainWindow):
         location = os.path.dirname(os.path.realpath(__file__))
 
         self.filename = filename
+        self.new_file = None
         self.dataframe = pd.read_csv(self.filename)
         self.unique_ids = np.sort(np.unique(self.dataframe['FIELD_SID_PATIENT_ID'].astype(str).values))
 
@@ -292,31 +393,35 @@ class SecondWindow(QtWidgets.QMainWindow):
         
         self.open_action = QtWidgets.QAction('Open csv File', self)
         self.file_menu.addAction(self.open_action)
+        self.open_action.triggered.connect(self.open_file)
         
         self.reset_action = QtWidgets.QAction('Reset Window', self)
         self.reset_action.triggered.connect(self.reset_window)
         self.edit_menu.addAction(self.reset_action)
         
         self.showAll_action = QtWidgets.QAction('Show All Dataframe', self)
-        self.showAll_action.triggered.connect(self.show_dataframe)
+        self.showAll_action.triggered.connect(self.show_all_dataframe)
         self.data_menu.addAction(self.showAll_action)
         self.showSel_action = QtWidgets.QAction('Show Selected Dataframe', self)
         self.data_menu.addAction(self.showSel_action)
+        self.showSel_action.triggered.connect(self.show_sel_dataframe)
         
         self.importNew_action = QtWidgets.QAction('Import New xml Files', self)
         self.import_menu.addAction(self.importNew_action)
+        self.importNew_action.triggered.connect(self.add_rows)
         self.importMeta_action= QtWidgets.QAction('Import Metadata', self)
         self.importMeta_action.triggered.connect(self.import_data)
         self.import_menu.addAction(self.importMeta_action)
+        
+        self.getHelp_action = QtWidgets.QAction('Show B.A.S Instructions')
+        self.help_menu.addAction(self.getHelp_action)
+        self.getHelp_action.triggered.connect(self.open_HelpDialog)
         
         self.column_label = QtWidgets.QLabel(self)
         self.column_label.setText('Filter Options')
         self.column_label.setFont(subsection_font)
         self.column_label.setToolTip('Select and Filter Data to plot.') 
-        
-        #self.explanation_label = QtWidgets.QLabel(self)
-        #self.explanation_label.setText('Select data to plot')
-        
+
         self.first_label = QtWidgets.QLabel(self)
         self.first_label.setText('1) Patient ID Selection')
         self.first_label.setFont(label_font)
@@ -379,9 +484,8 @@ class SecondWindow(QtWidgets.QMainWindow):
         
         self.initiate_idBox(self.unique_ids)        
         
-        self.date_box = CheckableComboBox()
-        self.date_box.model().setItem(0,0,self.date_label)
-        self.date_box.lineEdit().setText("----- Select/Deselect Dates ------")
+        self.date_button = QtWidgets.QPushButton('Filter Series by Date')
+        self.date_button.setToolTip('Show Pop-up Window to Remove Datapoints by Date and ID.')
 
         self.imported_box = CheckableComboBox()
         self.imported_box.model().setItem(0,0,self.imported_label)
@@ -390,6 +494,7 @@ class SecondWindow(QtWidgets.QMainWindow):
         self.table_window= None
         self.selected_frame = None
         self.metadata = None
+        self.popup_window = None
         
         self.meta_groupbox = QtWidgets.QGroupBox('Metadata Plotting Options')
 
@@ -427,7 +532,7 @@ class SecondWindow(QtWidgets.QMainWindow):
         first_column.addWidget(self.third_label, stretch = 2)
         first_column.addWidget(self.feature_groupbox, stretch = 1)
         first_column.addWidget(self.fourth_label, stretch = 2)
-        first_column.addWidget(self.date_box, stretch = 1)
+        first_column.addWidget(self.date_button, stretch = 1)
         first_column.addWidget(self.meta_label, stretch = 2)
         first_column.addWidget(self.imported_box, stretch = 1)
         first_column.addWidget(self.meta_groupbox, stretch = 1)
@@ -437,10 +542,7 @@ class SecondWindow(QtWidgets.QMainWindow):
         second_column.addWidget(self.toolbar)
         second_column.addWidget(self.canvas)
 
-        self.date_box.setEnabled(False)
-        self.date_box.setVisible(True)
         root_layout.addLayout(first_column)
-        #root_layout.addStretch()
         root_layout.addLayout(second_column)
         self.toolbar.setVisible(False)
         self.imported_box.setEnabled(False)
@@ -455,12 +557,43 @@ class SecondWindow(QtWidgets.QMainWindow):
 
         self.plot_button.clicked.connect(self.gen_plot)
         self.stat_button.clicked.connect(self.generate_boxplot)
+        self.date_button.clicked.connect(self.show_datePopup)
 
         self.setWindowIcon(QtGui.QIcon(os.path.join(location, 'BloodAnalyzerIcon.png')))
         self.setWindowTitle("B.A.S.")
         
         print(self.size())
+    
+    def open_file(self):
+    
+        file, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Select a file",
+                                                            os.path.dirname(os.path.abspath(__file__)),
+                                                            "Comma-separated values (*.csv)")
         
+        #print(file)
+        
+        if file !='':
+            self.new_file = file
+            self.signal.emit('Change SecondWindow file')
+            #print(self.new_file)
+            self.close()
+    
+    def add_rows(self):
+        #options = QtWidgets.QFileDialog.Options()
+        #options |= QtWidgets.QFileDialog.MultiSelection
+        filenames, _ = QtWidgets.QFileDialog.getOpenFileNames(self, "Select file(s)",
+                                                        os.path.dirname(os.path.abspath(__file__)),
+                                                        "Extensible Markup Language (*.xml)")
+        
+        if filenames:
+            raw_df = parse_multiple_files(filenames)
+            clean_df = clean_dataframe(raw_df)
+        
+        self.dataframe = pd.concat([self.dataframe, clean_df], axis=0)#self.dataframe()
+        self.dataframe = self.dataframe.reset_index(drop=True)
+        self.initiate_idBox(np.sort(np.unique(self.dataframe['FIELD_SID_PATIENT_ID'].astype(str).values)))        
+    
+    
     def initiate_idBox(self, unique_ids):
         self.id_box.model().setItem(0,0,self.selected_label)
         self.id_box.lineEdit().setText("----- Select Patient(s) -----")
@@ -474,6 +607,10 @@ class SecondWindow(QtWidgets.QMainWindow):
                 self.id_box.addItem('Patient ID %s' % unique_ids[i])
             item = self.id_box.model().item(i+1, 0)
             item.setCheckState(QtCore.Qt.CheckState.Unchecked)
+    
+    def open_HelpDialog(self):
+        self.welcome_dialog = WelcomeDialog()
+        self.welcome_dialog.exec_()
     
     def get_checkedItem(self, buttonGroup):
     
@@ -491,13 +628,8 @@ class SecondWindow(QtWidgets.QMainWindow):
         print("Selected Family:", selected_feature)
         print("Selected Tests:", selected_test)
 
-        patient_ids = sorted(self.id_box.selected_items)
-        #family = self.feature_box.selected_items
-        #tests = self.test_box.selected_items
-        selected_dates = self.date_box.selected_items
-        if selected_dates:
-            print("Selected Dates:", selected_dates)
-
+        patient_ids = sorted(self.id_box.selected_items, key = lambda x: x.split(' ')[-1])#[patient.split(' ')[-1] for patient in sorted(self.id_box.selected_items)]
+        patient_ids = [id.split(' ')[-1] for id in patient_ids]
         #if len(family) == 0:
         #    family.append('RBC FAMILY')
         #if len(tests) ==0:
@@ -505,19 +637,66 @@ class SecondWindow(QtWidgets.QMainWindow):
 
         self.toolbar.setVisible(True)
         self.canvas.setVisible(True)
-        self.date_box.setEnabled(True)
         self.fourth_label.setEnabled(True)
+        
+        self.filtered_plot(self.dataframe, patient_ids)
+        #print(features)
+        #print(self.canvas.size())
+        #print(self.size())
+        self.resize(1620, 980)
+
+    def show_warning_message(self, warning_list, selected_test):
+
+        if len(warning_list)==1:
+            self.warning_box.setText('Patient ID #'+str(warning_list[0])+" has no "+selected_test+" samples." +'\n' + 'Try with another patients ID.')
+            self.warning_box.exec_()
+        elif len(warning_list)>1:
+            self.warning_box.setText('Patients IDs #'+str(','.join(warning_list))+" have no "+selected_test+" samples." +'\n' + 'Try with another patients ID.')
+            self.warning_box.exec_()
+    
+    def show_datePopup(self):
+    
+        selected_test = self.get_checkedItem(self.test_buttonGroup)
+        patient_ids = sorted(self.id_box.selected_items, key = lambda x: x.split(' ')[-1])#[patient.split(' ')[-1] for patient in sorted(self.id_box.selected_items)]
+        patient_ids = [id.split(' ')[-1] for id in patient_ids]
+        
+        #pattern = re.compile(r'\b(' + '|'.join(map(re.escape, patient_ids)) + r')\b')
+        
+        pattern = '|'.join(['^{}$'.format(id) for id in patient_ids])
+        
+        #print(patient_ids)
+        patient_df = self.dataframe[(self.dataframe['FIELD_SID_PATIENT_ID'].str.contains(pattern))&
+                                    (self.dataframe['FIELD_SID_ANIMAL_NAME'].isin([selected_test]))]
+        
+        patient_dict = {patient: group['ANALYSIS_DATE'].tolist() for patient, group in patient_df.groupby('FIELD_SID_PATIENT_ID')}
+        
+        #print(patient_dict)
+        
+        self.popup_window = ListSelectionWindow(parent=None, patients_dict= patient_dict)
+        
+        self.popup_window.exec_()
+        
+        modified_dict = self.popup_window.patients
+        
+        modified_set = set((key, date) for key, dates in modified_dict.items() for date in dates)
+        
+        #print()
+        #print(modified_set)
+        filtered_df = patient_df[patient_df.apply(lambda x: (x['FIELD_SID_PATIENT_ID'], x['ANALYSIS_DATE'])  in modified_set, axis=1)]
+        
+        self.filtered_plot(filtered_df, patient_ids)
+    
+    def filtered_plot(self, dataframe, patient_ids):
+    
+        selected_test = self.get_checkedItem(self.test_buttonGroup)
+        selected_feature = self.get_checkedItem(self.feature_buttonGroup)
+        features = family_dict[selected_feature]
+        
+        warning_list = []
         self.canvas.fig.clf()
         self.canvas.axs = []
         axis = None
-
-        features = family_dict[selected_feature]
-
-        warning_list = []
-        unique_dates = []
-
-        print(features)
-
+        
         for idx,feature in enumerate(features):
             self.canvas.axs.append(axis)
             if selected_feature =='WBC FAMILY':
@@ -531,19 +710,12 @@ class SecondWindow(QtWidgets.QMainWindow):
             raw_dates = []
             for patient in patient_ids:
                 complete_dates = None
-                patient = patient.split(' ')[-1]
                 print(patient)
-                patient_df = self.dataframe[(self.dataframe['FIELD_SID_PATIENT_ID']==str(patient))&
-                                            (self.dataframe['FIELD_SID_ANIMAL_NAME'].isin([selected_test]))]
-                if selected_dates:
-                    copy = patient_df.copy()
-                    patient_df = patient_df[(self.dataframe['ANALYSIS_DATE'].str.contains('|'.join(
-                                            selected_dates), case=True))]
-                    complete_dates = [value.split(' ')[0] for value in copy['ANALYSIS_DATE'].values]
-                    #print(np.unique(copy['ANALYSIS_DATE'].values))
+                patient_df = dataframe[(dataframe['FIELD_SID_PATIENT_ID']==str(patient))&
+                                        (dataframe['FIELD_SID_ANIMAL_NAME'].isin([selected_test]))]
                 datapoints = patient_df[raw_feature]
                 print(datapoints.values)
-                dates = self.dataframe['ANALYSIS_DATE'][datapoints.index]
+                dates = dataframe['ANALYSIS_DATE'][datapoints.index]
                 dates = [date.split(' ')[0] for date in dates.values]
                 print(dates)
                 l, = axis.plot(dates, datapoints, ls=':', marker = 'o', linewidth=2.5)
@@ -552,7 +724,7 @@ class SecondWindow(QtWidgets.QMainWindow):
                 if complete_dates:
                     raw_dates.extend(complete_dates)
                 try:
-                    limits = [self.dataframe[feature+'_'+limit][datapoints.index].values[0]
+                    limits = [dataframe[feature+'_'+limit][datapoints.index].values[0]
                               for limit in ['LowLimit', 'HighLimit']]
                     data.append(datapoints)
                     datepoints.append(dates)
@@ -565,11 +737,8 @@ class SecondWindow(QtWidgets.QMainWindow):
                 min_value = np.min(np.hstack(data).flatten())
                 max_value = np.max(np.hstack(data).flatten())
                 axis.set_ylim(min_value-1, max_value+2)
-                #axis.axhline(y = limits[0], label='LowLimit', ls='-.', c='r')
-                #axis.axhline(y = limits[1], label='HighLimit', ls='-.', c='y')
             except:
                 pass
-            #print('Raw dates:', raw_dates)
             axis.set_xlabel('Date')
             axis.set_ylabel(feature)
             axis.legend()
@@ -579,110 +748,24 @@ class SecondWindow(QtWidgets.QMainWindow):
         self.canvas.fig.autofmt_xdate()
         self.canvas.fig.suptitle(t = selected_feature + " Time-series", fontsize = 24, y=0.95)
         self.canvas.draw()
-        
-        self.update_datebox(raw_dates, unique_dates)
-        #print(self.canvas.size())
-        #print(self.size())        
-        self.resize(1620, 980)
-        #self.showMaximized()
 
-    def show_warning_message(self, warning_list, selected_test):
-
-        if len(warning_list)==1:
-            self.warning_box.setText('Patient ID #'+str(warning_list[0])+" has no "+selected_test+" samples." +'\n' + 'Try with another patients ID.')
-            self.warning_box.exec_()
-        elif len(warning_list)>1:
-            self.warning_box.setText('Patients IDs #'+str(','.join(warning_list))+" have no "+selected_test+" samples." +'\n' + 'Try with another patients ID.')
-            self.warning_box.exec_()
-
-    def update_datebox(self, raw_dates, new_dates):
-        try:
-            new_dates = sorted(new_dates, key = lambda x: datetime.strptime(x, '%d-%m-%y'))
-            raw_dates = sorted(raw_dates, key = lambda x: datetime.strptime(x, '%d-%m-%y'))
-        except:
-            new_dates = sorted(new_dates, key = lambda x: datetime.strptime(x, '%Y/%m/%d'))
-            raw_dates = sorted(raw_dates, key = lambda x: datetime.strptime(x, '%Y/%m/%d'))    
-        count = self.date_box.count()
-        previous_dates = [self.date_box.itemText(i) for i in range(count)][1:]
-        print('Old date count:', count)
-        print('All date count:', len(raw_dates))
-        print('Checked date count:', len(new_dates))
-        if count == 1:
-            for i in range(len(new_dates)):
-                self.date_box.addItem('%s'% new_dates[i])
-                item = self.date_box.model().item(i+1,0)
-                item.setCheckState(QtCore.Qt.Checked)
-                #self.date_box.selected_items.append(new_dates[i])
-        elif count>1 and len(raw_dates)>0:
-            for i in range(len(raw_dates)):
-                if i <count-1:
-                    self.date_box.setItemText(i+1, raw_dates[i])
-                else:
-                    self.date_box.addItem('%s'% raw_dates[i])
-                item = self.date_box.model().item(i+1,0)
-                if raw_dates[i] in new_dates:
-                    item.setCheckState(QtCore.Qt.CheckState.Checked)
-                else:
-                    item.setCheckState(QtCore.Qt.CheckState.Unchecked)
-
-            for item in previous_dates:
-                if item not in new_dates:
-                    self.date_box.removeItem(self.date_box.findText(item))
-        elif count>1 and len(raw_dates)==0:
-            for i in range(len(new_dates)):
-                if i <count-1:
-                    self.date_box.setItemText(i+1, new_dates[i])
-                else:
-                    self.date_box.addItem('%s'% new_dates[i])
-                item = self.date_box.model().item(i+1,0)
-                if new_dates[i] in raw_dates:
-                    item.setCheckState(QtCore.Qt.CheckState.Checked)
-                else:
-                    item.setCheckState(QtCore.Qt.CheckState.Unchecked)
-
-            for item in previous_dates:
-                if item not in new_dates:
-                    self.date_box.removeItem(self.date_box.findText(item))
-        
-        
-        print('New date count:', self.date_box.count()-1)
-
-    def show_dataframe(self):
+    def show_sel_dataframe(self):
         patient_ids = [patient.split(' ')[-1] for patient in self.id_box.selected_items]
         selected_feature = self.get_checkedItem(self.feature_buttonGroup)
         selected_test = self.get_checkedItem(self.test_buttonGroup)
-        selected_dates = self.date_box.selected_items
-        if selected_dates:
-            patient_df = self.dataframe[(self.dataframe['FIELD_SID_PATIENT_ID'].str.contains('|'.join(patient_ids), case=True))&
-                                        (self.dataframe['FIELD_SID_ANIMAL_NAME'].isin([selected_test]))&
-                                        (self.dataframe['ANALYSIS_DATE'].str.contains('|'.join(selected_dates), case=True))]
-            #self.dataframe['ANALYSIS_DATE'].isin(selected_dates)
-            #print(patient_df)
-        else:
-            patient_df = self.dataframe[(self.dataframe['FIELD_SID_PATIENT_ID'].str.contains('|'.join(patient_ids), case=True))&
-                                        (self.dataframe['FIELD_SID_ANIMAL_NAME'].isin([selected_test]))]
+        pattern = '|'.join(['^{}$'.format(id) for id in patient_ids])
+        patient_df = self.dataframe[(self.dataframe['FIELD_SID_PATIENT_ID'].str.contains(pattern))&
+                                    (self.dataframe['FIELD_SID_ANIMAL_NAME'].isin([selected_test]))]
+        
         self.selected_frame = patient_df
+        
+        
         self.table_window = TableWindow(self.selected_frame)
         self.table_window.show()
-
-    def export_dataframe(self):
-        patient_ids = [patient.split(' ')[-1] for patient in self.id_box.selected_items]
-        features = self.feature_box.selected_items
-        tests = self.test_box.selected_items
-        selected_dates = self.date_box.selected_items
-        if selected_dates:
-            patient_df = self.dataframe[(self.dataframe['FIELD_SID_PATIENT_ID'].str.contains('|'.join(patient_ids), case=True))&
-                                        (self.dataframe['FIELD_SID_ANIMAL_NAME'].isin(tests))&
-                                        (self.dataframe['ANALYSIS_DATE'].str.contains('|'.join(selected_dates), case=True))]
-            #self.dataframe['ANALYSIS_DATE'].isin(selected_dates)
-            #print(patient_df)
-        else:
-            patient_df = self.dataframe[(self.dataframe['FIELD_SID_PATIENT_ID'].str.contains('|'.join(patient_ids), case=True))&
-                                        (self.dataframe['FIELD_SID_ANIMAL_NAME'].isin(tests))]
-        self.selected_frame = patient_df
-        filename = os.path.join(self.root,'tests', 'selected_data.csv')
-        self.selected_frame.to_csv(filename, index=False)
-        #current_date = str(datetime())
+    
+    def show_all_dataframe(self):
+        self.table_window = TableWindow(self.dataframe)
+        self.table_window.show()
 
     def import_data(self):
         file, _ = QtWidgets.QFileDialog.getOpenFileName(self,"Select a file",
@@ -721,20 +804,16 @@ class SecondWindow(QtWidgets.QMainWindow):
 
         self.toolbar.setVisible(True)
         self.canvas.setVisible(True)
-        #self.df_button.setVisible(True)
-        #self.export_button.setVisible(True)
         
         selected_feature = self.get_checkedItem(self.feature_buttonGroup)
         selected_test = self.get_checkedItem(self.test_buttonGroup)
-
-        #family = self.feature_box.selected_items
-        #tests = self.test_box.selected_items
-
         meta_patients = [str(animal_id) for animal_id in self.metadata['animal_id'].values]
+        pattern = '|'.join(['^{}$'.format(id) for id in meta_patient])
+        
+        #print(patient_ids)
+        selected_df = self.dataframe[(self.dataframe['FIELD_SID_PATIENT_ID'].str.contains(pattern))&
+                                    (self.dataframe['FIELD_SID_ANIMAL_NAME'].isin([selected_test]))]
         #print(meta_patients)(self.dataframe['FIELD_SID_PATIENT_ID'].str.contains('|'.join(meta_patients), case=True))
-
-        selected_df = self.dataframe[(self.dataframe['FIELD_SID_PATIENT_ID'].str.contains('|'.join(meta_patients), case=True))&
-                                     (self.dataframe['FIELD_SID_ANIMAL_NAME'].isin([selected_test]))]
 
         #print(selected_df)
 
@@ -822,10 +901,6 @@ class SecondWindow(QtWidgets.QMainWindow):
 
     def reset_window(self):
         self.initiate_idBox(self.unique_ids)        
-        #self.initiate_testBox(np.unique(self.dataframe['FIELD_SID_ANIMAL_NAME'].values))
-        #self.initiate_featureBox(families)
-        self.date_box.clear()
-        self.date_box.selected_items.clear()
         self.canvas.hide()
 
 class ScreenHandler(QtWidgets.QMainWindow):
@@ -840,10 +915,23 @@ class ScreenHandler(QtWidgets.QMainWindow):
 
     @QtCore.pyqtSlot(str)
     def change_window(self, event):
-        print(self.first_window.selected_file)
-        self.second_window = SecondWindow(self.first_window.selected_file)
-        #self.second_window.info_box.exec_()
-        self.second_window.show()
+        print(event)
+        if event == 'Open SecondWindow':
+            print(self.first_window.selected_file)
+            self.second_window = SecondWindow(self.first_window.selected_file)
+            self.second_window.signal.connect(self.change_window)
+            self.second_window.setStyleSheet("QMainWindow { border: 1px solid black; }")
+
+            #self.second_window.info_box.exec_()
+            self.second_window.show()
+        elif event == 'Change SecondWindow file':
+            print(self.second_window.new_file)
+            new_file = self.second_window.new_file
+            self.second_window = SecondWindow(new_file)
+            self.second_window.setStyleSheet("QMainWindow { border: 1px solid black; }")
+
+            #self.second_window.info_box.exec_()
+            self.second_window.show()
 
 if __name__ == '__main__':
 
