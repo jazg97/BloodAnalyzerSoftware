@@ -8,8 +8,9 @@
 3. [Folder structure](#folder-structure)
 4. [Features](#features)
 5. [Examples](#examples)
-6. [Contact us](#contact-us)
-7. [License](#license)
+6. [Contributing](#contributing)
+7. [Contact us](#contact-us)
+8. [License](#license)
 
 ## Overview
 
@@ -75,7 +76,7 @@ The project has the following structure:
     │   ├── 20221031134832.xml
     │   │
     ├── docs
-    ├── features
+    ├── code
     │   ├── cleaning_csv.py
     │   ├── generating_plots.py
     │   ├── GUI.py
@@ -86,16 +87,18 @@ The project has the following structure:
     ├── figures
     │   ├── multiple_ids_feature_ex1.png
     │   ├── multiple_ids_feature_ex2.png
-    ├── features
-    │   ├── cleaned_data.csv
-    │   ├── test.csv
+    ├── exemplaryFiles
+    │   ├── exemplary_csv.csv
+    │   ├── exemplary_csv_w_meta.csv
+	│   ├── exemplary_meta.xlsx
+	
                 
 ## Features
 
 The Blood Analyzer Software (B.A.S.) is a data visualization and explorative tool, consequently most of its features are related to these tasks.
 
-1. Generate new csv file
-2. Plot time-series by feature family and patients' ID
+1. Generate csv files from xml files
+2. Plot time-series by feature family, patients' ID and dates
 3. Import metadata
 4. Generate boxplot with imported metadata keys
 	4.1. Global plot
@@ -127,6 +130,15 @@ $ #Then select the option of Start New Analysis
 
 2. Recurrent Analysis
 
+## Contributing
+
+If you'd like to contribute to this project, please follow these steps:
+
+1. Fork the repository
+2. Create a new branch for your changes
+3. Make your changes and commit them with descriptive commit messages
+4. Push your changes to your fork
+5. Create a pull request from your fork to the main repository
 
 ## Contact Us
 
