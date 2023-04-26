@@ -103,8 +103,8 @@ The Blood Analyzer Software (B.A.S.) is a data visualization and explorative too
 2. Plot time-series by feature family, patients' ID and dates: Visualize time-series from ids of interest, see trends and compare subpopulations.
 3. Import metadata: Add new data into the csv file which could further help in the analysis of the study.
 4. Generate boxplot with imported metadata keys
-	4.1. Global plot: Obtain global statistics related to metadata of interest.
-	4.2. Boxplot time-series: Visualize time-series from ids of interested located inside the metadata file.
+	1. Global plot: Obtain global statistics related to metadata of interest.
+	2. Boxplot time-series: Visualize time-series from ids of interested located inside the metadata file.
 5. Extract statistical features: Obtain statistical features from the plotted data.
 
 ## Examples
@@ -114,11 +114,10 @@ Additionally, you can just run the executable GUI provided in the repository and
 
 These are some common usage examples.
 
-1. New Analysis
 
-	1. Start new analysis
+1. Start new analysis
 
-		1. Generate new csv file without GUI
+	1. Generate new csv file without GUI
 
 		The file generate_csv.py can generate csv files from a single directory, you need to follow these steps:
 
