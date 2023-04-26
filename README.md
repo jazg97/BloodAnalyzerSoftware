@@ -117,28 +117,28 @@ These are some common usage examples.
 
 #1. Start new analysis
 
-	1. Generate new csv file without GUI
+1. Generate new csv file without GUI
 
-	The file generate_csv.py can generate csv files from a single directory, you need to follow these steps:
+The file generate_csv.py can generate csv files from a single directory, you need to follow these steps:
 
-	```py
-	$ cd BloodAnalyzerSoftware
-	$ python3 ./code/generate_csv.py files_dir output_dir/output_name.csv
-	```
+```py
+$ cd BloodAnalyzerSoftware
+$ python3 ./code/generate_csv.py files_dir output_dir/output_name.csv
+```
 
-	2. Generate new csv file with GUI
+2. Generate new csv file with GUI
 
-	You can open the GUI over the command line by carrying out the steps described below:
+You can open the GUI over the command line by carrying out the steps described below:
 
-	```py
-	$ cd BloodAnalyzerSoftware
-	$ python3 features/GUI.py
-	$ #Then select the option of Start New Analysis
-	```
+```py
+$ cd BloodAnalyzerSoftware
+$ python3 features/GUI.py
+$ #Then select the option of Start New Analysis
+```
 
-	Altenatively, you can just run the .exe. Either way, here are the steps you need to follow to create a new CSV file in the GUI.
+Altenatively, you can just run the .exe. Either way, here are the steps you need to follow to create a new CSV file in the GUI.
 
-	<img alt="New Analaysis Procedure" src="docs/start_NewAnalysis.svg" width="100%">
+<img alt="New Analaysis Procedure" src="docs/start_NewAnalysis.svg" width="100%">
 
 #2. Access a dataset of interest
 
