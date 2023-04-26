@@ -116,32 +116,32 @@ These are some common usage examples.
 
 1. New Analysis
 
-1.1. Start new analysis
+	1. Start new analysis
 
-1.1.1. Generate new csv file without GUI
+		1. Generate new csv file without GUI
 
-The file generate_csv.py can generate csv files from a single directory, you need to follow these steps:
+		The file generate_csv.py can generate csv files from a single directory, you need to follow these steps:
 
-```py
-$ cd BloodAnalyzerSoftware
-$ python3 ./code/generate_csv.py files_dir output_dir/output_name.csv
-```
+		```py
+		$ cd BloodAnalyzerSoftware
+		$ python3 ./code/generate_csv.py files_dir output_dir/output_name.csv
+		```
 
-1.1.2. Generate new csv file with GUI
+	2. Generate new csv file with GUI
 
-You can open the GUI over the command line by following these steps:
+		You can open the GUI over the command line by following these steps:
 
-```py
-$ cd BloodAnalyzerSoftware
-$ python3 features/GUI.py
-$ #Then select the option of Start New Analysis
-```
+		```py
+		$ cd BloodAnalyzerSoftware
+		$ python3 features/GUI.py
+		$ #Then select the option of Start New Analysis
+		```
 
-Altenatively, you can just run the .exe. Either way, there are 3 steps when you create a new csv file from the GUI.
+		Altenatively, you can just run the .exe. Either way, there are 3 steps when you create a new csv file from the GUI.
 
-<img alt="Overview of MainWindow" src="docs/startNewAnalysis.svg" width="100%">
+		<img alt="Overview of MainWindow" src="docs/startNewAnalysis.svg" width="100%">
 
-1.2. Explore data by patients' ID and feature family
+1.2. Explore data by patients' ID, feature family and date
 
 <img alt="Overview of MainWindow" src="docs/basic_useCase.svg" width="100%">
 
