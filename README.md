@@ -115,7 +115,7 @@ Additionally, you can just run the executable GUI provided in the repository and
 These are some common usage examples.
 
 
-#1. Start new analysis
+### 1. Start new analysis
 
 1. Generate new csv file without GUI
 
@@ -140,13 +140,13 @@ Altenatively, you can just run the .exe. Either way, here are the steps you need
 
 <img alt="New Analaysis Procedure" src="docs/start_NewAnalysis.svg" width="100%">
 
-#2. Access a dataset of interest
+###2. Access a dataset of interest
 
 Here's what you need to do to access the CSV file with the relevant dataset:
 
 <img alt="Load CSV File" src="docs/load_RecurrentFile.svg" width="100%">
 
-#3. Explore data by patients' ID, feature family and date
+###3. Explore data by patients' ID, feature family and date
 
 Once you have accessed a dataset, you can explore and visualize its data following these instructions.
 
@@ -154,17 +154,17 @@ Once you have accessed a dataset, you can explore and visualize its data followi
 
 <img alt="Show Data" src="docs/show_Data.svg" width="100%">
 
-#4. Import metadata 
+###4. Import metadata 
 
 If the are special characteristics in the data that couldn't be included during file exportation, you can always generate an additional --(FILE)--, all that's necessary is follow the next :
 
-#5. Generate Box-plot using imported metadata
+###5. Generate Box-plot using imported metadata
 
 	1. Global metrics
 	
 	2. Time-series by metadata
 
-#6. Visualize Statistical Features
+###6. Visualize Statistical Features
 
 ## Contributing
 
