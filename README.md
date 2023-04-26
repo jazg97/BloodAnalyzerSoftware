@@ -14,9 +14,9 @@
 
 ## Overview
 
-<img alt="Overview of blood analyzer system" src="docs/BAS_overview.svg" width="100%">
+Blood Analyzer Software (B.A.S.) is a data visualization and explorative tool, it allows to analyze blood samples from an hematological analyzer and reformat the data into a tabular format.
 
-<img alt="Overview of MainWindow" src="docs/basic_useCase.svg" width="100%">
+<img alt="Overview of blood analyzer system" src="docs/BAS_overview.svg" width="100%">
 
 ## Setup
 
@@ -99,14 +99,13 @@ The project has the following structure:
 
 The Blood Analyzer Software (B.A.S.) is a data visualization and explorative tool, consequently most of its features are related to these tasks.
 
-1. Generate csv files from xml files
-2. Plot time-series by feature family, patients' ID and dates
-3. Import metadata
+1. Generate csv files from xml files: Choose a directory that contains all the XML of interest and obtain a csv file with all its data reformatted.
+2. Plot time-series by feature family, patients' ID and dates: Visualize time-series from ids of interest, see trends and compare subpopulations.
+3. Import metadata: Add new data into the csv file which could further help in the analysis of the study.
 4. Generate boxplot with imported metadata keys
-	4.1. Global plot
-	4.2. Boxplot time-series
-5. Extract statistical features
-6. Export selected data
+	4.1. Global plot: Obtain global statistics related to metadata of interest.
+	4.2. Boxplot time-series: Visualize time-series from ids of interested located inside the metadata file.
+5. Extract statistical features: Obtain statistical features from the plotted data.
 
 ## Examples
 
@@ -130,7 +129,11 @@ $ #Then select the option of Start New Analysis
 ```
 1.2. Explore data by patients' ID and feature family
 
+<img alt="Overview of MainWindow" src="docs/basic_useCase.svg" width="100%">
+
 2. Recurrent Analysis
+
+<img alt="Overview of MainWindow" src="docs/basic_useCase.svg" width="100%">
 
 ## Contributing
 
