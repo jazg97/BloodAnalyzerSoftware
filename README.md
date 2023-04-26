@@ -128,7 +128,7 @@ These are some common usage examples.
 
 	2. Generate new csv file with GUI
 
-	You can open the GUI over the command line by following these steps:
+	You can open the GUI over the command line by carrying out the steps described below:
 
 	```py
 	$ cd BloodAnalyzerSoftware
@@ -136,15 +136,19 @@ These are some common usage examples.
 	$ #Then select the option of Start New Analysis
 	```
 
-	Altenatively, you can just run the .exe. Either way, there are 3 steps when you create a new csv file from the GUI.
+	Altenatively, you can just run the .exe. Either way, here are the steps you need to follow to create a new CSV file in the GUI.
 
-	<img alt="Overview of MainWindow" src="docs/startNewAnalysis.svg" width="100%">
+	<img alt="Overview of MainWindow" src="docs/start_NewAnalysis.svg" width="100%">
 
-1.2. Explore data by patients' ID, feature family and date
+2. Access a dataset of interest
 
-<img alt="Overview of MainWindow" src="docs/basic_useCase.svg" width="100%">
+Here's what you need to do to access the CSV file with the relevant dataset:
 
-2. Recurrent Analysis
+<img alt="Overview of MainWindow" src="docs/load_RecurrentFile.svg" width="100%">
+
+3. Explore data by patients' ID, feature family and date
+
+Once you have accessed a dataset, you can explore and visualize its data following these instructions.
 
 <img alt="Overview of MainWindow" src="docs/basic_useCase.svg" width="100%">
 
