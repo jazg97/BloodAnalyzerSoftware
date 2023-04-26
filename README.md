@@ -105,7 +105,6 @@ The Blood Analyzer Software (B.A.S.) is a data visualization and explorative too
 4. Generate boxplot with imported metadata keys
 	1. Global plot: Obtain global statistics related to metadata of interest.
 	2. Boxplot time-series: Visualize time-series from ids of interested located inside the metadata file.
-5. Extract statistical features: Obtain statistical features from the plotted data.
 
 ## User Guide
 
@@ -124,9 +123,9 @@ These are some common usage examples.
 
 <details>
 
-<summary title="Click to expand/collapse">1. Generate new csv file without GUI</summary>
+<summary title="Click to expand/collapse">1. Generate new `CSV` file without GUI</summary>
 
-You can generate csv files without launching B.A.S, follow these steps:
+You can generate `CSV` files without launching B.A.S, follow these steps:
 
 ```py
 $ cd BloodAnalyzerSoftware
@@ -145,7 +144,7 @@ $ cd BloodAnalyzerSoftware
 $ python3 ./code/GUI.py
 ```
 
-Altenatively, you can just run the .exe. Either way, here are the steps you need to follow to create a new CSV file in the GUI.
+Altenatively, you can just run the .exe. Either way, here are the steps you need to follow to create a new `CSV` file in the GUI.
 
 <img alt="New Analaysis Procedure" src="docs/start_NewAnalysis.svg" width="100%">
 
@@ -155,9 +154,9 @@ Altenatively, you can just run the .exe. Either way, here are the steps you need
 
 <details>
 
-<summary title="Click to expand/collapse"> 1. Open csv file </summary>
+<summary title="Click to expand/collapse"> 1. Open `CSV` file </summary>
 
-Here's what you need to do to access the CSV file with the relevant dataset:
+Here's what you need to do to access the `CSV` file with the relevant dataset:
 
 <img alt="Load CSV File" src="docs/load_RecurrentFile.svg" width="100%">
 
@@ -183,23 +182,25 @@ Once you have accessed a dataset, you can explore and visualize its data followi
 <details>
 <summary title="Click to expand/collapse"> 1. Recommended file format </summary>
 
-| Syntax      | Description |
-| ----------- | ----------- |
-| Header      | Title       |
-| Paragraph   | Text        |
+You need to format your metadata as shown below and save it as a `CSV` or `XSLX` file.
+ 
+| animal_id   | Genotype    | Treatment   | Date-of-interest |... |
+| ----------- | ----------- | ----------- | ---------------- |--- |
+| ID #1       | Control+    | Treat #1    | dd-mm-YYYY       |... |
+| ID #2       | Test-       | Treat #2    | dd-mm-YYYY       |... |
+| ...         | ...         | ...         | ...              |... |
 
-```json
-{
-  "firstName": "John",
-  "lastName": "Smith",
-  "age": 25
-}
-```
+It is especially important to write the ID identically as it's in the original `CSV` file, as without this, it won't be associated correctly inside the program.
+
 </details>
 
 <details>
 
-<summary = ""> 2. Upload metadata </summary>
+<summary = "Click to expand/collapse"> 2. Upload metadata </summary>
+
+You can load the metadata file into the dataset following accessing the Import Menu.
+
+<img alt="Insert metadata" src="docs/insert_meta.svg" width = "100%">
 
 </details>
 
@@ -207,14 +208,31 @@ Once you have accessed a dataset, you can explore and visualize its data followi
 ### 5. Generate boxplot with metadata
 
 <details>
-<summary title="Click to expand/collapse"> 1. Show Global Results  </summary>
+<summary title="Click to expand/collapse"> 1. Select metadata </sumary>
+
+Similar to ID and Family selection, you can select metadata of interest and choose between plotting global or time-series results of your experiment.
+
+<img alt="Select Meta" src="docs/select_meta.svg" width = "100%">
+
 </details>
 
 <details>
-<summary title="Click to expand/collapse"> 2. Show Time-series Results  </summary>
+<summary title="Click to expand/collapse"> 2. Show Global Results  </summary>
+
+Example of Global results.
+
+<img alt="Show Global" src="docs/show_global.svg" width = "100%">
+
 </details>
 
-### 6. Visualize Statistical Features
+<details>
+<summary title="Click to expand/collapse"> 3. Show Time-series Results  </summary>
+
+Example of Time-series Results
+
+<img alt="Show Time-series" src="docs/show_series.svg" width = "100%">
+
+</details>
 
 ## Contributing
 
