@@ -109,6 +109,9 @@ The Blood Analyzer Software (B.A.S.) is a data visualization and explorative too
 
 ## Examples
 
+There are two approaches you can take when using the B.A.S. First, you can modify and adapt the provided codes (./code), and run everything from terminal as a minimal version.
+Additionally, you can just run the executable GUI provided in the repository and explore your dataset.
+
 These are some common usage examples.
 
 1. New Analysis
@@ -116,17 +119,28 @@ These are some common usage examples.
 1.1. Start new analysis
 
 1.1.1. Generate new csv file without GUI
+
+The file generate_csv.py can generate csv files from a single directory, you need to follow these steps:
+
 ```py
 $ cd BloodAnalyzerSoftware
-$ python3 features/generate_csv.py files_dir output_dir/output_name.csv
+$ python3 ./code/generate_csv.py files_dir output_dir/output_name.csv
 ```
 
 1.1.2. Generate new csv file with GUI
+
+You can open the GUI over the command line by following these steps:
+
 ```py
 $ cd BloodAnalyzerSoftware
 $ python3 features/GUI.py
 $ #Then select the option of Start New Analysis
 ```
+
+Altenatively, you can just run the .exe. Either way, there are 3 steps when you create a new csv file from the GUI.
+
+<img alt="Overview of MainWindow" src="docs/startNewAnalysis.svg" width="100%">
+
 1.2. Explore data by patients' ID and feature family
 
 <img alt="Overview of MainWindow" src="docs/basic_useCase.svg" width="100%">
