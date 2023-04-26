@@ -138,19 +138,35 @@ These are some common usage examples.
 
 	Altenatively, you can just run the .exe. Either way, here are the steps you need to follow to create a new CSV file in the GUI.
 
-	<img alt="Overview of MainWindow" src="docs/start_NewAnalysis.svg" width="100%">
+	<img alt="New Analaysis Procedure" src="docs/start_NewAnalysis.svg" width="100%">
 
 2. Access a dataset of interest
 
 Here's what you need to do to access the CSV file with the relevant dataset:
 
-<img alt="Overview of MainWindow" src="docs/load_RecurrentFile.svg" width="100%">
+<img alt="Load CSV File" src="docs/load_RecurrentFile.svg" width="100%">
 
 3. Explore data by patients' ID, feature family and date
 
 Once you have accessed a dataset, you can explore and visualize its data following these instructions.
 
-<img alt="Overview of MainWindow" src="docs/basic_useCase.svg" width="100%">
+<img alt="Exploring Filter Options" src="docs/basic_useCase.svg" width="100%">
+
+<img alt="Show Data" src="docs/show_Data.svg" width="100%">
+
+4. Import metadata 
+
+If the are special characteristics in the data that couldn't be included during file exportation, you can always generate an additional --(FILE)--, all that's necessary is follow the next :
+
+5. Generate Box-plot using imported metadata
+
+	1. Global metrics
+	
+	2. Time-series by metadata
+
+6. Visualize Statistical Features
+
+
 
 ## Contributing
 
