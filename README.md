@@ -7,7 +7,7 @@
 	- [Clone repository](#get-repository)
 3. [Folder structure](#folder-structure)
 4. [Features](#features)
-5. [Examples](#examples)
+5. [User guide](#user-guide)
 6. [Contributing](#contributing)
 7. [Contact us](#contact-us)
 8. [License](#license)
@@ -107,46 +107,67 @@ The Blood Analyzer Software (B.A.S.) is a data visualization and explorative too
 	2. Boxplot time-series: Visualize time-series from ids of interested located inside the metadata file.
 5. Extract statistical features: Obtain statistical features from the plotted data.
 
-## B.A.S User Guide
+## User Guide
 
-There are two approaches you can take when using the B.A.S. First, you can modify and adapt the provided codes (./code), and run everything from terminal as a minimal version.
+There are two options to access the program. You can run the program 'GUI.py' from the command line or opening the executable.
+
+
+
+First, you can modify and adapt the provided codes (./code), and run everything from terminal as a minimal version.
 Additionally, you can just run the executable GUI provided in the repository and explore your dataset.
 
 These are some common usage examples.
 
 
-### Start new analysis
+### 1) Start new analysis
 
-#### 1. Generate new csv file without GUI
 
-The file generate_csv.py can generate csv files from a single directory, you need to follow these steps:
+<details>
+
+<summary title="Click to expand/collapse">1. Generate new csv file without GUI</summary>
+
+You can generate csv files without launching B.A.S, follow these steps:
 
 ```py
 $ cd BloodAnalyzerSoftware
-$ python3 ./code/generate_csv.py files_dir output_dir/output_name.csv
+$ python3 ./code/generate_csv.py <input_data_directory> <output_directory>/<output_filename>.csv
 ```
+</details>
 
-#### 2. Generate new csv file with GUI
+<details>
+
+<summary title="Click to expand/collapse">2. Generate new csv file in GUI</summary>
 
 You can open the GUI over the command line by carrying out the steps described below:
 
 ```py
 $ cd BloodAnalyzerSoftware
-$ python3 features/GUI.py
-$ #Then select the option of Start New Analysis
+$ python3 ./code/GUI.py
 ```
 
 Altenatively, you can just run the .exe. Either way, here are the steps you need to follow to create a new CSV file in the GUI.
 
 <img alt="New Analaysis Procedure" src="docs/start_NewAnalysis.svg" width="100%">
 
+</details>
+
 ### 2. Access a dataset of interest
+
+<details>
+
+<summary title="Click to expand/collapse"> 1. Open csv file </summary>
 
 Here's what you need to do to access the CSV file with the relevant dataset:
 
 <img alt="Load CSV File" src="docs/load_RecurrentFile.svg" width="100%">
 
-### 3. Explore data by patients' ID, feature family and date
+</details>
+
+### 3. Explore and visualize data
+
+<details>
+
+<summary title="CLick to expand/collapse"> 1. Select and Filter Data </summary>
 
 Once you have accessed a dataset, you can explore and visualize its data following these instructions.
 
@@ -154,15 +175,44 @@ Once you have accessed a dataset, you can explore and visualize its data followi
 
 <img alt="Show Data" src="docs/show_Data.svg" width="100%">
 
-### 4. Import metadata 
+</details>
 
-If the are special characteristics in the data that couldn't be included during file exportation, you can always generate an additional --(FILE)--, all that's necessary is follow the next :
 
-### 5. Generate Box-plot using imported metadata
+### 4. Add metadata 
 
-	1. Global metrics
-	
-	2. Time-series by metadata
+<details>
+<summary title="Click to expand/collapse"> 1. Recommended file format </summary>
+
+| Syntax      | Description |
+| ----------- | ----------- |
+| Header      | Title       |
+| Paragraph   | Text        |
+
+```json
+{
+  "firstName": "John",
+  "lastName": "Smith",
+  "age": 25
+}
+```
+</details>
+
+<details>
+
+<summary = ""> 2. Upload metadata </summary>
+
+</details>
+
+
+### 5. Generate boxplot with metadata
+
+<details>
+<summary title="Click to expand/collapse"> 1. Show Global Results  </summary>
+</details>
+
+<details>
+<summary title="Click to expand/collapse"> 2. Show Time-series Results  </summary>
+</details>
 
 ### 6. Visualize Statistical Features
 
@@ -189,4 +239,3 @@ If you'd like to contribute to this project, please follow these steps:
 ## License
 
 Blood Analyzer Software is released under the [MIT License](http://www.opensource.org/licenses/MIT) - Jose Zapana & Eric Schmitt - 2023.
-
