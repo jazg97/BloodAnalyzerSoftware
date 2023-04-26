@@ -208,7 +208,8 @@ You can load the metadata file into the dataset following accessing the Import M
 ### 5. Generate boxplot with metadata
 
 <details>
-<summary title="Click to expand/collapse"> 1. Select metadata </sumary>
+
+<summary title="Click to expand/collapse"> 1. Select metadata </summary>
 
 Similar to ID and Family selection, you can select metadata of interest and choose between plotting global or time-series results of your experiment.
 
