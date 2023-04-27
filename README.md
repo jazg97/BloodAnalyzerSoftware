@@ -150,7 +150,7 @@ Altenatively, you can just run the .exe. Either way, here are the steps you need
 
 </details>
 
-### 2. Access a dataset of interest
+### 2) Access a dataset of interest
 
 <details>
 
@@ -162,7 +162,7 @@ Here's what you need to do to access the `CSV` file with the relevant dataset:
 
 </details>
 
-### 3. Explore and visualize data
+### 3) Explore and visualize data
 
 <details>
 
@@ -172,12 +172,19 @@ Once you have accessed a dataset, you can explore and visualize its data followi
 
 <img alt="Exploring Filter Options" src="docs/basic_useCase.svg" width="100%">
 
+</details>
+
+<details>
+
+<summary title=""> 2. Show Data </summary>
+
+Example of time-series plot.
+
 <img alt="Show Data" src="docs/show_Data.svg" width="100%">
 
 </details>
 
-
-### 4. Add metadata 
+### 4) Add metadata 
 
 <details>
 <summary title="Click to expand/collapse"> 1. Recommended file format </summary>
@@ -205,7 +212,7 @@ You can load the metadata file into the dataset following accessing the Import M
 </details>
 
 
-### 5. Generate boxplot with metadata
+### 5) Generate boxplot with metadata
 
 <details>
 
