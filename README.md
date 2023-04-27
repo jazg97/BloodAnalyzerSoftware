@@ -108,15 +108,7 @@ The Blood Analyzer Software (B.A.S.) is a data visualization and explorative too
 
 ## User Guide
 
-There are two options to access the program. You can run the program 'GUI.py' from the command line or opening the executable.
-
-
-
-First, you can modify and adapt the provided codes (./code), and run everything from terminal as a minimal version.
-Additionally, you can just run the executable GUI provided in the repository and explore your dataset.
-
-These are some common usage examples.
-
+There are two options to access the program. You can run the program 'GUI.py' from the command line or open the executable. These are the main sections and features accesible in the program.
 
 ### 1) Start new analysis
 
