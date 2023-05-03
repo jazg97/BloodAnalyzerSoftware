@@ -22,6 +22,8 @@ family_dict = {'PLT FAMILY': PLT, 'RBC FAMILY': RBC, 'WBC FAMILY': WBC}
 
 families = ['PLT FAMILY', 'RBC FAMILY', 'WBC FAMILY']
 
+colors = [(1, 0, 0), (0, 1, 0), (0, 0, 1), (1, 1, 0), (0.5, 0, 0.5)]
+
 #Class wrapper for Canvas and Plotting Capabilities
 class MplCanvas(FigureCanvasQTAgg):
     def __init__(self, parent=None, width=12, height=9, dpi=100):
@@ -510,7 +512,7 @@ class SecondWindow(QtWidgets.QMainWindow):
         self.meta_groupbox.setLayout(self.contained_box)
         #self.feature_buttonGroup.setExclusive(True)
 
-        self.stat_button = QtWidgets.QPushButton('Generate Box-Plot')
+        self.stat_button = QtWidgets.QPushButton('Generate Scatter Plot')
         self.stat_button.setToolTip('Generate Global or Time-based Boxplot based on Metadata.')
         
         self.warning_box = QtWidgets.QMessageBox()
@@ -589,11 +591,12 @@ class SecondWindow(QtWidgets.QMainWindow):
             raw_df = parse_multiple_files(filenames)
             clean_df = clean_dataframe(raw_df)
         
-        self.dataframe = pd.concat([self.dataframe, clean_df], axis=0)#self.dataframe()
-        self.dataframe = self.dataframe.reset_index(drop=True)
-        self.initiate_idBox(np.sort(np.unique(self.dataframe['FIELD_SID_PATIENT_ID'].astype(str).values)))        
-    
-    
+            self.dataframe = pd.concat([self.dataframe, clean_df], axis=0)#self.dataframe()
+            self.dataframe = self.dataframe.reset_index(drop=True)
+            self.initiate_idBox(np.sort(np.unique(self.dataframe['FIELD_SID_PATIENT_ID'].astype(str).values)))
+        
+        self.dataframe.to_csv(self.filename, index=False)
+
     def initiate_idBox(self, unique_ids):
         self.id_box.model().setItem(0,0,self.selected_label)
         self.id_box.lineEdit().setText("----- Select Patient(s) -----")
@@ -685,6 +688,8 @@ class SecondWindow(QtWidgets.QMainWindow):
         filtered_df = patient_df[patient_df.apply(lambda x: (x['FIELD_SID_PATIENT_ID'], x['ANALYSIS_DATE'])  in modified_set, axis=1)]
         
         self.filtered_plot(filtered_df, patient_ids)
+        
+        self.resize(1620, 980)
     
     def filtered_plot(self, dataframe, patient_ids):
     
@@ -748,6 +753,8 @@ class SecondWindow(QtWidgets.QMainWindow):
         self.canvas.fig.autofmt_xdate()
         self.canvas.fig.suptitle(t = selected_feature + " Time-series", fontsize = 24, y=0.95)
         self.canvas.draw()
+        
+        self.canvas.setVisible(True)
 
     def show_sel_dataframe(self):
         patient_ids = [patient.split(' ')[-1] for patient in self.id_box.selected_items]
@@ -799,7 +806,35 @@ class SecondWindow(QtWidgets.QMainWindow):
             self.stat_button.setEnabled(True)
             self.meta_label.setEnabled(True)
             self.meta_groupbox.setEnabled(True)
-
+    
+    def generate_scatterPlot(self):
+        self.toolbar.setVisible(True)
+        self.canvas.setVisible(True)
+        
+        selected_feature = self.get_checkedItem(self.feature_buttonGroup)
+        selected_test = self.get_checkItem(self.test_buttonGroup)
+        meta_patients = self.metadata['animal_id'].values.astype(str)
+        print(meta_patients)
+        print('Alt, ', [str(animal_id) for animal_id in self.metadata['animal_id'].values])
+        pattern = '|'.join(['^{}$'.format(id) for id in meta_patients])
+        
+        selected_df = self.dataframe[(self.dataframe['FIELD_SID_PATIENT_ID'].str.contains(pattern))&
+                                    (self.dataframe['FIELD_SID_ANIMAL_NAME'].isin([selected_test]))]
+                                    
+        filters = self.imported_box.selected_items
+        
+        if len(filters)>1:
+            column = '-'.join(filters)
+            selected_df[column] = selected_df[filters].apply(lambda x: '_'.join(x), axis=1)
+            uniques = selected_df[column].unique()
+        else:
+            column = filters[0]
+            uniques = selected_df[column].unique()
+            
+        groupings = [np.where(selected_df[column].values==unique) for unique in uniques]
+                
+    
+    
     def generate_boxplot(self):
 
         self.toolbar.setVisible(True)
@@ -808,7 +843,7 @@ class SecondWindow(QtWidgets.QMainWindow):
         selected_feature = self.get_checkedItem(self.feature_buttonGroup)
         selected_test = self.get_checkedItem(self.test_buttonGroup)
         meta_patients = [str(animal_id) for animal_id in self.metadata['animal_id'].values]
-        pattern = '|'.join(['^{}$'.format(id) for id in meta_patient])
+        pattern = '|'.join(['^{}$'.format(id) for id in meta_patients])
         
         #print(patient_ids)
         selected_df = self.dataframe[(self.dataframe['FIELD_SID_PATIENT_ID'].str.contains(pattern))&
@@ -829,7 +864,6 @@ class SecondWindow(QtWidgets.QMainWindow):
             uniques = selected_df[column].unique()
 
         groupings = [np.where(selected_df[column].values==unique) for unique in uniques]
-
         #print(groupings)
 
         wd = 0.5
@@ -840,6 +874,7 @@ class SecondWindow(QtWidgets.QMainWindow):
         #print('A')
         features = family_dict[selected_feature] #self.get_checkedItem(self.feature_buttonGroup)
         features = [feature+'_Value' for feature in features]
+        patches = [mpatches.Patch(color=colors[idx], label = uniques[idx])  for idx, group in enumerate(groupings)]
         if self.global_radio.isChecked():
             print('Global')
             x_pos = 0.5
@@ -849,35 +884,23 @@ class SecondWindow(QtWidgets.QMainWindow):
                 else:
                     axis = self.canvas.fig.add_subplot(2,int(np.ceil(len(features)/2)),idx+1)
 
-                #print('B')
-                for idy, group in enumerate(groupings):
-                    series = selected_df[feature].values[group]
-                    axis.bar(x_pos+idy*wd, np.mean(series), width=wd, yerr=np.std(series),
-                             alpha=0.5, ecolor='black', capsize=6, label=uniques[idy])
-                    axis.set_ylabel(feature)
-
+                total_points = []
+                labels = []
+                c_scatter = []
+                _ = [(total_points.append(selected_df[feature].values[group])) for idx, group in enumerate(groupings)]
+                _ = [labels.append([uniques[idx]]*len(total_points[idx])) for idx,group in enumerate(groupings)]
+                _ = [c_scatter.append([colors[idx]]*len(total_points[idx])) for idx, group in enumerate(groupings)]
+                axis.scatter([item for sub in labels for item in sub], [item for sub in total_points for item in sub],
+                            alpha=0.5, c=[item for sub in c_scatter for item in sub])
+                axis.tick_params(axis='x', which='both', bottom=False, top=False, labelbottom=True)
+                axis.set_xticks(np.arange(len(uniques)), uniques)
+                axis.set_xlim(-0.5,len(uniques)*0.5 + 1.0)
+                axis.set_ylim(max(0,min([item for sub in total_points for item in sub])-1.5), max([item for sub in total_points for item in sub])+1.5)
+                axis.set_ylabel(feature)
+                
         elif self.time_radio.isChecked():
             print('Time-based')
             unique_dates = selected_df['ANALYSIS_DATE'].apply(lambda x: x.split(' ')[0]).unique()
-
-            medians = []
-            stds  = []#lol
-            for idx, date in enumerate(unique_dates):
-                selected_perdate = selected_df[selected_df['ANALYSIS_DATE'].str.contains(date)]
-                groupings = [np.where(selected_perdate[column].values == unique)
-                             for unique in uniques]
-                median_perdate = []
-                std_perdate = []
-                for idy, group in enumerate(groupings):
-                    median_pergroup = np.median(selected_perdate[features].values[group], axis=0)
-                    std_pergroup =  np.std(selected_perdate[features].values[group], axis=0)
-                    median_perdate.append(median_pergroup)
-                    std_perdate.append(std_pergroup)
-                medians.append(np.vstack(median_perdate))
-                stds.append(np.vstack(std_perdate))
-            medians = np.array(medians)
-            stds = np.array(stds)
-
             x_pos = np.arange(1,2*len(unique_dates), 2)
 
             for idx, feature in enumerate(features):
@@ -885,19 +908,37 @@ class SecondWindow(QtWidgets.QMainWindow):
                     axis = self.canvas.fig.add_subplot(3,3,idx+1)
                 else:
                     axis = self.canvas.fig.add_subplot(2,int(np.ceil(len(features)/2)),idx+1)
-                [axis.bar(x_pos+i*wd, medians[:,i,idx], yerr=stds[:,i,idx],
-                 width=wd, alpha=0.5, ecolor='black', capsize=6, label=uniques[i])
-                 for i in range(medians.shape[1])]
+                total_points = []
+                pos = []
+                c_scatter = []
+                labels = []
+                for i, date in enumerate(unique_dates):                
+                    selected_perdate = selected_df[selected_df['ANALYSIS_DATE'].str.contains(date)]
+                    groupings = [np.where(selected_perdate[column].values == unique)
+                                 for unique in uniques]                    
+                    _ = [total_points.append(selected_perdate[feature].values[group]) for group in groupings]
+                    _ = [pos.append([wd*(len(groupings)+1)*i +wd+idx*wd]*len(total_points[idx + i*len(groupings)])) for idx, group in enumerate(groupings)]
+                    _ = [c_scatter.append([colors[idx]]*len(total_points[idx + i*len(groupings)])) for idx, group in enumerate(groupings)]
+                
+                axis.scatter([item for sub in pos for item in sub], [item for sub in total_points for item in sub], 
+                            c = [item for sub in c_scatter for item in sub], alpha=0.5)
+                axis.tick_params(axis='x', which='both', bottom=False, top=False, labelbottom=True)
+                axis.set_xlim(-0.5,x_pos[-1]+1.5)
+                axis.set_ylim(max(0,min([item for sub in total_points for item in sub])-1.5), max([item for sub in total_points for item in sub])+1.5)
+                
                 axis.set_ylabel(feature)
-                axis.set_xticks(x_pos+wd, unique_dates)
+                axis.set_xticks(x_pos, unique_dates)
             self.canvas.fig.autofmt_xdate()#Comment if plotting fails
         else:
             pass
         #print('F')
-        handles, labels = axis.get_legend_handles_labels()
-        self.canvas.fig.legend(handles,labels, loc='upper left')
+        #handles, labels = axis.get_legend_handles_labels()
+        #print(handles)
+        #print(labels)
+        self.canvas.fig.legend(handles=patches, loc='upper left')
         #self.canvas.fig.suptitle(family[0]+' & METADATA')
         self.canvas.draw()
+        self.resize(1620, 980)
 
     def reset_window(self):
         self.initiate_idBox(self.unique_ids)        
