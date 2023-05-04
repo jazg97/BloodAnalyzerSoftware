@@ -110,8 +110,35 @@ The Blood Analyzer Software (B.A.S.) is a data visualization and explorative too
 
 There are two options to access the program. You can run the program 'GUI.py' from the command line or open the executable. These are the main sections and features accesible in the program.
 
-### 1) Start new analysis
+## 1) Export files from Hematology Analyzer
 
+<details>
+
+<summary title= "Click to expand/collapse">  1. Export XML files with format </summary>
+
+When exporting a file from the Hematology Analyzer you need to fill out some fields in the machine in order to assign correctly important information for its analysis.
+
+<img alt= "Snapshot with blank fields" src="docs/example_img.jpg" width="100%">
+
+Some fields, such as Tier-ID, Name, and Haltername will be used to differentiate between samples, and as such its recommended to fill them out like this:
+
+* Tier-ID: This will be the patient ID and it's recommended to assign an integer number and not a combination of characters with numbers if not necessary.
+* Name: This will be the type of blood source, such as systemic blood (BLOOD), bone marrow (BM), spleen (SPLEEN), femur (FEMUR), etc. It's important to maintain a consistent system of naming blood sources for their analysis.
+* Haltername: This will be the 'owner' or head of laboratory in charge of the study and this field will be used to avoid mixing samples.
+* Geburtsdatum: It's important to fill out the date of the sample in the correct date format to allow a correct time-series analysis.
+
+When generating a csv file, these fields will have its 
+
+| FIELD_SID_PATIENT_ID    | FIELD_SID_ANIMAL_NAME   | FIELD_SID_OWNER_LASTNAME | ANALYSIS_DATE |... |
+| ----------------------- | ----------------------- | ------------------------ | ------------- |--- |
+| 120                     | BLOOD                   | GUEZGUEZ                 | dd-mm-YYYY    |... |
+| 140                     | FEMUR                   | SCHUPPAN                 | dd-mm-YYYY    |... |
+| ...                     | ...                     | ...                      | ...           |... |
+
+
+</details>
+
+### 2) Start new analysis
 
 <details>
 
@@ -142,7 +169,7 @@ Altenatively, you can just run the .exe. Either way, here are the steps you need
 
 </details>
 
-### 2) Access a dataset of interest
+### 3) Access a dataset of interest
 
 <details>
 
@@ -154,7 +181,7 @@ Here's what you need to do to access the `CSV` file with the relevant dataset:
 
 </details>
 
-### 3) Explore and visualize data
+### 4) Explore and visualize data
 
 <details>
 
@@ -176,7 +203,7 @@ Example of time-series plot.
 
 </details>
 
-### 4) Add metadata 
+### 5) Add metadata 
 
 <details>
 <summary title="Click to expand/collapse"> 1. Recommended file format </summary>
@@ -204,7 +231,7 @@ You can load the metadata file into the dataset following accessing the Import M
 </details>
 
 
-### 5) Generate boxplot with metadata
+### 6) Generate scatter plot with metadata
 
 <details>
 
