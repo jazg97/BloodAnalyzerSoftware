@@ -110,13 +110,13 @@ The Blood Analyzer Software (B.A.S.) is a data visualization and explorative too
 
 There are two options to access the program. You can run the program 'GUI.py' from the command line or open the executable. These are the main sections and features accesible in the program.
 
-## 1) Export files from Hematology Analyzer
+### 1) Export files from Hematology Analyzer
 
 <details>
 
 <summary title= "Click to expand/collapse">  1. Export XML files with format </summary>
 
-When exporting a file from the Hematology Analyzer you need to fill out some fields in the machine in order to assign correctly important information for its analysis.
+When exporting a file from the `Hematology Analyzer` you need to fill out some fields in the machine in order to assign correctly important information for its analysis.
 
 <img alt= "Snapshot with blank fields" src="docs/example_img.jpg" width="100%">
 
@@ -127,7 +127,7 @@ Some fields, such as Tier-ID, Name, and Haltername will be used to differentiate
 * Haltername: This will be the 'owner' or head of laboratory in charge of the study and this field will be used to avoid mixing samples.
 * Geburtsdatum: It's important to fill out the date of the sample in the correct date format to allow a correct time-series analysis.
 
-When generating a csv file, these fields will have its 
+When generating a `CSV` file, these fields will have its correspondent name.
 
 | FIELD_SID_PATIENT_ID    | FIELD_SID_ANIMAL_NAME   | FIELD_SID_OWNER_LASTNAME | ANALYSIS_DATE |... |
 | ----------------------- | ----------------------- | ------------------------ | ------------- |--- |
