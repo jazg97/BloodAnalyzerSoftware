@@ -102,9 +102,9 @@ The Blood Analyzer Software (B.A.S.) is a data visualization and explorative too
 1. Generate csv files from xml files: Choose a directory that contains all the XML of interest and obtain a csv file with all its data reformatted.
 2. Plot time-series by feature family, patients' ID and dates: Visualize time-series from ids of interest, see trends and compare subpopulations.
 3. Import metadata: Add new data into the csv file which could further help in the analysis of the study.
-4. Generate boxplot with imported metadata keys
+4. Generate scatter plot with metadata fields
 	1. Global plot: Obtain global statistics related to metadata of interest.
-	2. Boxplot time-series: Visualize time-series from ids of interested located inside the metadata file.
+	2. Time-series: Visualize time-series from ids of interested located inside the metadata file.
 
 ## User Guide
 
@@ -263,7 +263,7 @@ Example of Time-series Results
 ### 7) Edit the canvas and its subplots 
 
 <details>
-<summary title="Click to expand/collapse"> Modify canvas setings with Toolbar </summary>
+<summary title="Click to expand/collapse"> 1. Modify canvas setings with Toolbar </summary>
 
 Additionally, there is the option to modify most of the canvas settings with its Toolbar, which is located right above it. This toolbar have the following buttons:
 

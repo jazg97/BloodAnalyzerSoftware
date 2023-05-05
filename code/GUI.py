@@ -272,6 +272,7 @@ class SimpleSelectionWindow(QtWidgets.QDialog):
         self.initial_list_widget.itemClicked.connect(self.update_list)
         
         self.selected_list_widget= QtWidgets.QListWidget()
+        self.selected_list_widget.addItems(self.selected_items)
         
         self.add_button = QtWidgets.QPushButton(">>")
         self.add_button.setToolTip("Select an Item")
@@ -341,7 +342,6 @@ class ListSelectionWindow(QtWidgets.QDialog):
         self.list_selection_button = QtWidgets.QPushButton("Update Plot")
         self.list_selection_button.setFixedSize(200, 60)
         self.list_selection_button.clicked.connect(self.close)
-        #self.list_selection_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         
         self.patients = patients_dict
         
@@ -640,7 +640,6 @@ class SecondWindow(QtWidgets.QMainWindow):
                                                             os.path.dirname(os.path.abspath(__file__)),
                                                             "Comma-separated values (*.csv)")
         
-        #print(file)
         
         if file !='':
             self.new_file = file
@@ -649,8 +648,7 @@ class SecondWindow(QtWidgets.QMainWindow):
             self.close()
     
     def add_rows(self):
-        #options = QtWidgets.QFileDialog.Options()
-        #options |= QtWidgets.QFileDialog.MultiSelection
+        
         filenames, _ = QtWidgets.QFileDialog.getOpenFileNames(self, "Select file(s)",
                                                         os.path.dirname(os.path.abspath(__file__)),
                                                         "Extensible Markup Language (*.xml)")
@@ -799,6 +797,7 @@ class SecondWindow(QtWidgets.QMainWindow):
                 min_value = np.min(np.hstack(data).flatten())
                 max_value = np.max(np.hstack(data).flatten())
                 axis.set_ylim(min_value-1, max_value+2)
+                axis.set_xlim(-0.5, len(unique_dates)-0.5)
             except:
                 pass
             axis.set_xlabel('Date')
@@ -812,6 +811,7 @@ class SecondWindow(QtWidgets.QMainWindow):
         self.canvas.draw()
         
         self.canvas.setVisible(True)
+        self.toolbar.setVisible(True)
 
     def show_sel_dataframe(self):
         patient_ids = [patient.split(' ')[-1] for patient in self.selected_ids]
@@ -908,8 +908,15 @@ class SecondWindow(QtWidgets.QMainWindow):
                 _ = [(total_points.append(selected_df[feature].values[group])) for idx, group in enumerate(groupings)]
                 _ = [labels.append([uniques[idx]]*len(total_points[idx])) for idx,group in enumerate(groupings)]
                 _ = [c_scatter.append([colors[idx]]*len(total_points[idx])) for idx, group in enumerate(groupings)]
+                
+                means = [np.mean(sublist) for sublist in total_points]
+                stds = [np.std(sublist) for sublist in total_points]
+                
                 axis.scatter([item for sub in labels for item in sub], [item for sub in total_points for item in sub],
-                            alpha=0.5, c=[item for sub in c_scatter for item in sub])
+                            alpha=1.0, c=[item for sub in c_scatter for item in sub])
+                
+                [axis.errorbar(position,mean,yerr=std, c=col[0], marker='*', markersize= 9, linestyle='none',capsize=5, capthick=2, alpha=0.3)
+                 for idx,(position,mean,std,col) in enumerate(zip(np.arange(0,len(total_points)-1,1),means,stds,c_scatter))]
                 axis.tick_params(axis='x', which='both', bottom=False, top=False, labelbottom=True)
                 axis.set_xticks(np.arange(len(uniques)), uniques)
                 axis.set_xlim(-0.5,len(uniques)*0.5 + 1.0)
@@ -940,8 +947,14 @@ class SecondWindow(QtWidgets.QMainWindow):
                     _ = [pos.append([wd*(len(groupings)+1)*i +wd+idx*wd]*len(total_points[idx + i*len(groupings)])) for idx, group in enumerate(groupings)]
                     _ = [c_scatter.append([colors[idx]]*len(total_points[idx + i*len(groupings)])) for idx, group in enumerate(groupings)]
                 
+                means = [np.mean(sublist) for sublist in total_points]
+                stds = [np.std(sublist) for sublist in total_points]
+                #min_error = min([min(sublist) for sublist in total_points])
+                
                 axis.scatter([item for sub in pos for item in sub], [item for sub in total_points for item in sub], 
-                            c = [item for sub in c_scatter for item in sub], alpha=0.5)
+                            c = [item for sub in c_scatter for item in sub], alpha=1.0)
+                [axis.errorbar(position[0],mean,yerr=std, c=col[0], marker='*', markersize= 9, linestyle='none',capsize=5, capthick=2, alpha=0.3)
+                 for idx,(position,mean,std,col) in enumerate(zip(pos,means,stds,c_scatter))]
                 axis.tick_params(axis='x', which='both', bottom=False, top=False, labelbottom=True)
                 axis.set_xlim(-0.5,x_pos[-1]+1.5)
                 axis.set_ylim(max(0,min([item for sub in total_points for item in sub])-1.5), max([item for sub in total_points for item in sub])+1.5)
