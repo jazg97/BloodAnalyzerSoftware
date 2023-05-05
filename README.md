@@ -110,19 +110,19 @@ The Blood Analyzer Software (B.A.S.) is a data visualization and explorative too
 
 There are two options to access the program. You can run the program 'GUI.py' from the command line or open the executable. These are the main sections and features accesible in the program.
 
-### 1) Export files from Hematology Analyzer
+### 1) Export XML files
 
 <details>
 
-<summary title= "Click to expand/collapse">  1. Export XML files with format </summary>
+<summary title= "Click to expand/collapse">  1. Appropiate format for XML files  </summary>
 
 When exporting a file from the `Hematology Analyzer` you need to fill out some fields in the machine in order to assign correctly important information for its analysis.
 
 <img alt= "Snapshot with blank fields" src="docs/example_img.jpg" width="100%">
 
-Some fields, such as Tier-ID, Name, and Haltername will be used to differentiate between samples, and as such its recommended to fill them out like this:
+Some fields, such as Tier-ID, Name, and Haltername will be used to differentiate between samples, and as such its recommended to fill them out following some guidelines.
 
-* Tier-ID: This will be the patient ID and it's recommended to assign an integer number and not a combination of characters with numbers if not necessary.
+* Tier-ID: This will be the patient's ID and it's recommended to assign an integer number and not a combination of characters with numbers if not necessary.
 * Name: This will be the type of blood source, such as systemic blood (BLOOD), bone marrow (BM), spleen (SPLEEN), femur (FEMUR), etc. It's important to maintain a consistent system of naming blood sources for their analysis.
 * Haltername: This will be the 'owner' or head of laboratory in charge of the study and this field will be used to avoid mixing samples.
 * Geburtsdatum: It's important to fill out the date of the sample in the correct date format to allow a correct time-series analysis.
@@ -134,7 +134,6 @@ When generating a `CSV` file, these fields will have its correspondent name.
 | 120                     | BLOOD                   | GUEZGUEZ                 | dd-mm-YYYY    |... |
 | 140                     | FEMUR                   | SCHUPPAN                 | dd-mm-YYYY    |... |
 | ...                     | ...                     | ...                      | ...           |... |
-
 
 </details>
 
@@ -163,7 +162,7 @@ $ cd BloodAnalyzerSoftware
 $ python3 ./code/GUI.py
 ```
 
-Altenatively, you can just run the .exe. Either way, here are the steps you need to follow to create a new `CSV` file in the GUI.
+Altenatively, you can just run the .exe. Either way, here are the steps you need to follow to create a new `CSV` file inside the GUI.
 
 <img alt="New Analaysis Procedure" src="docs/start_NewAnalysis.svg" width="100%">
 
@@ -260,6 +259,50 @@ Example of Time-series Results
 <img alt="Show Time-series" src="docs/show_series.svg" width = "100%">
 
 </details>
+
+### 7) Edit the canvas and its subplots 
+
+<details>
+<summary title="Click to expand/collapse"> 2. Modify canvas setings with Toolbar </summary>
+
+Additionally, there is the option to modify most of the canvas settings with its Toolbar, which is located right above it. This toolbar have the following buttons:
+
+* Subplot configuration button: This button allows the user to modify the borders and spacings in between the subplots. You can also active the 'tight layout' mode which will automatically fit the data in the canvas.
+
+<img alt = "Modify subplot configuration" src="docs/configure_subplot.svg" width = "100%">
+
+* Edit axis, curve and image parameters button: This button allows the modification of most of the parameters for a specific subplot. This means, you can modify its title, x-axis and y-axis, its coloring, the type of linestyle, and many more.
+
+<img alt = "Modify axis,curve and image parameters" src="docs/modify_parameters.svg" width = "100%">
+
+* Save button: There is always the option to save the current figure, you just need to specify its name, save location and type of file.
+
+<img alt = "Save current figure" src="docs/export_figure.svg" width = "100%">
+
+* Zoom to rectangle button: Define a rectangular region by dragging the mouse while holding the button. When using the left mouse button, the axes view limits will be zoomed to the defined region. When using the right mouse button, the axes view limits will be zoomed out.
+
+<img alt = "Zoom rectangle in axis" src="docs/zoom_axis.svg" width = "100%">
+
+* Pan/Zoom button: This button has two modes: pan and zoom. Click the toolbar button to it, then put your mouse somewhere over an axis. Press the left mouse button and hold it to pan the figure, and press the right mouse button to zoom.
+
+<img alt = "Pan/Zoom in axis" src="docs/pan_zoom.svg" width = "100%">
+
+* Home/Forward/Back buttons: These buttons are used to navigate between defined views. The Forward and Back button are use to navigate back and forth, and the Home Button always take you the first, feature view of your data.
+
+<img alt = "Navigate between view" src="docs/navigate_views.svg" width = "100%">
+
+</details>
+
+### 8) Import XML files into current analysis
+
+<details>
+<summary title="Click to expand/collapse"> 1. Import new xml files to current analysis </summary>
+
+If some file was skipped during the `CSV` file generation, there is an option to add an specific `XML` file if necessary. You just need to follow the following steps:
+
+<img alt = "Import xml file to current csv" src="docs/import_xml.svg" width = "100%">
+</details>
+
 
 ## Contributing
 
