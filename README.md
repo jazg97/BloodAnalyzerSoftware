@@ -263,34 +263,57 @@ Example of Time-series Results
 ### 7) Edit the canvas and its subplots 
 
 <details>
-<summary title="Click to expand/collapse"> 2. Modify canvas setings with Toolbar </summary>
+<summary title="Click to expand/collapse"> Modify canvas setings with Toolbar </summary>
 
 Additionally, there is the option to modify most of the canvas settings with its Toolbar, which is located right above it. This toolbar have the following buttons:
 
-* Subplot configuration button: This button allows the user to modify the borders and spacings in between the subplots. You can also active the 'tight layout' mode which will automatically fit the data in the canvas.
+<ul>
+
+<li><details> <summary title="Click to expand/collapse">Subplot configuration button </summary>
+
+This button allows the user to modify the borders and spacings in between the subplots. You can also active the 'tight layout' mode which will automatically fit the data in the canvas.
 
 <img alt = "Modify subplot configuration" src="docs/configure_subplot.svg" width = "100%">
+</details>
+</li>
 
-* Edit axis, curve and image parameters button: This button allows the modification of most of the parameters for a specific subplot. This means, you can modify its title, x-axis and y-axis, its coloring, the type of linestyle, and many more.
+<li><details><summary title="Click to expand/collapse">Edit axis, curve and image parameters button </summary>
+
+This button allows the modification of most of the parameters for a specific subplot. This means, you can modify its title, x-axis and y-axis, its coloring, the type of linestyle, and many more.
 
 <img alt = "Modify axis,curve and image parameters" src="docs/modify_parameters.svg" width = "100%">
+</details>
+</li>
 
-* Save button: There is always the option to save the current figure, you just need to specify its name, save location and type of file.
+<li><details><summary title="Click to expand/collapse">Save button </summary>
+
+There is always the option to save the current figure, you just need to specify its name, save location and type of file.
 
 <img alt = "Save current figure" src="docs/export_figure.svg" width = "100%">
+</details>
+</li>
 
-* Zoom to rectangle button: Define a rectangular region by dragging the mouse while holding the button. When using the left mouse button, the axes view limits will be zoomed to the defined region. When using the right mouse button, the axes view limits will be zoomed out.
+<li><details><summary title="Click to expand/collapse">Zoom to rectangle button </summary>
+
+Define a rectangular region by dragging the mouse while holding the button. When using the left mouse button, the axes view limits will be zoomed to the defined region. When using the right mouse button, the axes view limits will be zoomed out.
 
 <img alt = "Zoom rectangle in axis" src="docs/zoom_axis.svg" width = "100%">
+</details>
+</li>
 
-* Pan/Zoom button: This button has two modes: pan and zoom. Click the toolbar button to it, then put your mouse somewhere over an axis. Press the left mouse button and hold it to pan the figure, and press the right mouse button to zoom.
+<li><details><summary title="Click to expand/collapse"> Pan/Zoom button </summary>
+This button has two modes: pan and zoom. Click the toolbar button to it, then put your mouse somewhere over an axis. Press the left mouse button and hold it to pan the figure, and press the right mouse button to zoom.
 
 <img alt = "Pan/Zoom in axis" src="docs/pan_zoom.svg" width = "100%">
+</details>
+</li>
 
-* Home/Forward/Back buttons: These buttons are used to navigate between defined views. The Forward and Back button are use to navigate back and forth, and the Home Button always take you the first, feature view of your data.
-
+<li><details><summary title="Click to expand/collapse"> Home/Forward/Back buttons </summary>
+These buttons are used to navigate between defined views. The Forward and Back button are use to navigate back and forth, and the Home Button always take you the first, feature view of your data.
 <img alt = "Navigate between view" src="docs/navigate_views.svg" width = "100%">
-
+</details>
+</li>
+</ul>
 </details>
 
 ### 8) Import XML files into current analysis
