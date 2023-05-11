@@ -125,14 +125,13 @@ Some fields, such as Tier-ID, Name, and Haltername will be used to differentiate
 * Tier-ID: This will be the patient's ID and it's recommended to assign an integer number and not a combination of characters with numbers if not necessary.
 * Name: This will be the type of blood source, such as systemic blood (BLOOD), bone marrow (BM), spleen (SPLEEN), femur (FEMUR), etc. It's important to maintain a consistent system of naming blood sources for their analysis.
 * Haltername: This will be the 'owner' or head of laboratory in charge of the study and this field will be used to avoid mixing samples.
-* Geburtsdatum: It's important to fill out the date of the sample in the correct date format to allow a correct time-series analysis.
 
 When generating a `CSV` file, these fields will have its correspondent name.
 
 | FIELD_SID_PATIENT_ID    | FIELD_SID_ANIMAL_NAME   | FIELD_SID_OWNER_LASTNAME | ANALYSIS_DATE |... |
 | ----------------------- | ----------------------- | ------------------------ | ------------- |--- |
-| 120                     | BLOOD                   | GUEZGUEZ                 | dd-mm-YYYY    |... |
-| 140                     | FEMUR                   | SCHUPPAN                 | dd-mm-YYYY    |... |
+| 120                     | BLOOD                   | OWNER #1                 | dd-mm-YYYY    |... |
+| 140                     | FEMUR                   | ONWER #2                 | dd-mm-YYYY    |... |
 | ...                     | ...                     | ...                      | ...           |... |
 
 </details>

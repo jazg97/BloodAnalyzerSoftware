@@ -970,7 +970,12 @@ class SecondWindow(QtWidgets.QMainWindow):
         self.resize(1620, 980)
 
     def reset_window(self):
-        self.initiate_idBox(self.unique_ids)        
+        #self.initiate_idBox(self.unique_ids)   
+        self.selected_ids = []
+        self.resize(360, 980)
+        self.canvas.fig.clf()
+        self.toolbar.hide()
+        self.canvas.draw()
         self.canvas.hide()
 
 
