@@ -468,8 +468,9 @@ class SecondWindow(QtWidgets.QMainWindow):
         self.menubar = self.menuBar()
         self.file_menu = self.menubar.addMenu('File')
         self.edit_menu = self.menubar.addMenu('Window')
-        self.import_menu= self.menubar.addMenu('Import')
         self.data_menu = self.menubar.addMenu('Data')
+        self.import_menu= self.menubar.addMenu('Import')
+        self.export_menu = self.menubar.addMenu('Export')
         self.help_menu = self.menubar.addMenu('Help')
         
         self.open_action = QtWidgets.QAction('Open csv File', self)
@@ -493,6 +494,10 @@ class SecondWindow(QtWidgets.QMainWindow):
         self.importMeta_action= QtWidgets.QAction('Import Metadata', self)
         self.importMeta_action.triggered.connect(self.import_data)
         self.import_menu.addAction(self.importMeta_action)
+        
+        self.exportSel_action = QtWidgets.QAction('Exported Selected Data', self)
+        self.export_menu.addAction(self.exportSel_action)
+        self.exportSel_action.triggered.connect(self.export_selection)
         
         self.getHelp_action = QtWidgets.QAction('Show B.A.S Instructions')
         self.help_menu.addAction(self.getHelp_action)
@@ -564,6 +569,7 @@ class SecondWindow(QtWidgets.QMainWindow):
         self.id_window = None
         self.meta_window = None
         self.selected_fields = []
+        self.desired_size = (1620, 980)
         
         self.meta_groupbox = QtWidgets.QGroupBox('Metadata Plotting Options')
 
@@ -696,7 +702,7 @@ class SecondWindow(QtWidgets.QMainWindow):
         
         pattern = '|'.join(['^{}$'.format(id) for id in patient_ids])
         
-        patient_df = self.dataframe[(self.dataframe['FIELD_SID_PATIENT_ID'].str.contains(pattern))&
+        patient_df = self.dataframe[(self.dataframe['FIELD_SID_PATIENT_ID'].astype(str).str.contains(pattern))&
                                     (self.dataframe['FIELD_SID_ANIMAL_NAME'].isin([selected_test]))]
         
         patient_dict = {patient: group['ANALYSIS_DATE'].tolist() for patient, group in patient_df.groupby('FIELD_SID_PATIENT_ID')}
@@ -712,7 +718,12 @@ class SecondWindow(QtWidgets.QMainWindow):
         
         self.filtered_plot(filtered_df, patient_ids)
         
-        self.resize(1620, 980)
+        current_size = self.size()
+        
+        if current_size.width() < self.desired_size[0] or current_size.height() < self.desired_size[1]:
+            self.resize(*self.desired_size)
+        
+        #self.resize(1620, 980)
 
     def gen_plot(self):
     
@@ -731,10 +742,10 @@ class SecondWindow(QtWidgets.QMainWindow):
         self.fourth_label.setEnabled(True)
         
         self.filtered_plot(self.dataframe, patient_ids)
-        #print(features)
-        #print(self.canvas.size())
-        #print(self.size())
-        self.resize(1620, 980)
+        current_size = self.size()
+        
+        if current_size.width() < self.desired_size[0] or current_size.height() < self.desired_size[1]:
+            self.resize(*self.desired_size)
 
     def show_warning_message(self, warning_list, selected_test):
 
@@ -771,7 +782,7 @@ class SecondWindow(QtWidgets.QMainWindow):
             for patient in patient_ids:
                 complete_dates = None
                 print(patient)
-                patient_df = dataframe[(dataframe['FIELD_SID_PATIENT_ID']==str(patient))&
+                patient_df = dataframe[(dataframe['FIELD_SID_PATIENT_ID'].astype(str)==str(patient))&
                                         (dataframe['FIELD_SID_ANIMAL_NAME'].isin([selected_test]))]
                 datapoints = patient_df[raw_feature]
                 print(datapoints.values)
@@ -818,12 +829,10 @@ class SecondWindow(QtWidgets.QMainWindow):
         selected_feature = self.get_checkedItem(self.feature_buttonGroup)
         selected_test = self.get_checkedItem(self.test_buttonGroup)
         pattern = '|'.join(['^{}$'.format(id) for id in patient_ids])
-        patient_df = self.dataframe[(self.dataframe['FIELD_SID_PATIENT_ID'].str.contains(pattern))&
+        patient_df = self.dataframe[(self.dataframe['FIELD_SID_PATIENT_ID'].astype(str).str.contains(pattern))&
                                     (self.dataframe['FIELD_SID_ANIMAL_NAME'].isin([selected_test]))]
         
         self.selected_frame = patient_df
-        
-        
         self.table_window = TableWindow(self.selected_frame)
         self.table_window.show()
     
@@ -847,18 +856,30 @@ class SecondWindow(QtWidgets.QMainWindow):
                 metadata = excel.parse()
 
             self.metadata = metadata
-            patient_ids = [str(animal_id) for animal_id in metadata['animal_id'].values]
-            for i,col in enumerate(metadata.columns[1:]):
-                uniques = metadata[col].unique()
-                self.dataframe[col]=''
-                for idx, patient in enumerate(patient_ids):
-                    self.dataframe.loc[self.dataframe['FIELD_SID_PATIENT_ID'].str.contains(patient),col]= metadata[metadata['animal_id']==int(patient)][col].values[0]
+            self.metadata['animal_id'] = self.metadata['animal_id'].astype(str)
+            self.dataframe = pd.merge(self.dataframe, self.metadata, left_on = 'FIELD_SID_PATIENT_ID', right_on = 'animal_id', how='left')
+            self.dataframe = self.dataframe.drop(columns = 'animal_id')
+
             self.global_radio.setEnabled(True)
             self.time_radio.setEnabled(True)
             self.stat_button.setEnabled(True)
             self.meta_label.setEnabled(True)
             self.meta_groupbox.setEnabled(True)
             self.selectMeta_button.setEnabled(True)
+    
+    def export_selection(self):
+            
+        filename, _ = QtWidgets.QFileDialog.getSaveFileName(self, 'Save as', os.path.dirname(os.path.abspath(__file__)), "Comma-separated values (*.csv)")
+        
+        if filename != '':
+            patient_ids = [patient.split(' ')[-1] for patient in self.selected_ids]
+            selected_feature = self.get_checkedItem(self.feature_buttonGroup)
+            selected_test = self.get_checkedItem(self.test_buttonGroup)
+            pattern = '|'.join(['^{}$'.format(id) for id in patient_ids])
+            patient_df = self.dataframe[(self.dataframe['FIELD_SID_PATIENT_ID'].astype(str).str.contains(pattern))&
+                                        (self.dataframe['FIELD_SID_ANIMAL_NAME'].isin([selected_test]))]
+            patient_df.to_csv(filename, index=False)        
+        
     
     def generate_boxplot(self):
 
@@ -870,7 +891,7 @@ class SecondWindow(QtWidgets.QMainWindow):
         meta_patients = [str(animal_id) for animal_id in self.metadata['animal_id'].values]
         pattern = '|'.join(['^{}$'.format(id) for id in meta_patients])
         
-        selected_df = self.dataframe[(self.dataframe['FIELD_SID_PATIENT_ID'].str.contains(pattern))&
+        selected_df = self.dataframe[(self.dataframe['FIELD_SID_PATIENT_ID'].astype(str).str.contains(pattern))&
                                     (self.dataframe['FIELD_SID_ANIMAL_NAME'].isin([selected_test]))]
 
         filters = self.selected_fields
@@ -967,7 +988,11 @@ class SecondWindow(QtWidgets.QMainWindow):
         self.canvas.fig.legend(handles=patches, loc='upper left')
         #self.canvas.fig.suptitle(family[0]+' & METADATA')
         self.canvas.draw()
-        self.resize(1620, 980)
+        #self.resize(1620, 980)
+        current_size = self.size()
+        
+        if current_size.width() < self.desired_size[0] or current_size.height() < self.desired_size[1]:
+            self.resize(*self.desired_size)
 
     def reset_window(self):
         #self.initiate_idBox(self.unique_ids)   

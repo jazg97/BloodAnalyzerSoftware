@@ -259,7 +259,19 @@ Example of Time-series Results
 
 </details>
 
-### 7) Edit the canvas and its subplots 
+### 7) Export selected data
+
+<details>
+
+<summary title="Click to expand/collapse"> 1. Export data </summary>
+
+You can export a subset of a `CSV` file by selecting and filtering the dataset, similar to the steps done when generating a time-series plot.
+
+<img alt="Export Data" src="docs/export_data.svg" width="100%">
+
+</details>
+
+### 8) Edit the canvas and its subplots 
 
 <details>
 <summary title="Click to expand/collapse"> 1. Modify canvas setings with Toolbar </summary>
