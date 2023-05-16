@@ -327,7 +327,7 @@ These buttons are used to navigate between defined views. The Forward and Back b
 </ul>
 </details>
 
-### 8) Import XML files into current analysis
+### 9) Import XML files into current analysis
 
 <details>
 <summary title="Click to expand/collapse"> 1. Import new xml files to current analysis </summary>
